@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb_newsdb
+    environment:
+      MONGO_INITDB_DATABASE: newsdb
+    volumes:
+      - mongodb_data:/data/db
+    ports:
+      - "27017:27017"
+    networks:
+      - news_network
+
+  postgres:
+    image: postgres:latest
+    container_name: postgres_newsmetadatadb
+    environment:
+      POSTGRES_DB: newsmetadatadb
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - news_network
+
+volumes:
+  mongodb_data:
+  postgres_data:
+
+networks:
+  news_network:
+    driver: bridge
