@@ -1,0 +1,45 @@
+CREATE TABLE news (
+    id SERIAL PRIMARY KEY,
+    title TEXT NOT NULL,
+    source TEXT,
+    url TEXT,
+    images TEXT[], 
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    content TEXT
+);
+CREATE TABLE newsmetadata (
+    id INTEGER PRIMARY KEY REFERENCES news(id) ON DELETE CASCADE,
+    keywords TEXT[], 
+    tags TEXT[]      
+);
+CREATE TABLE userrecommendationDB (
+    id SERIAL PRIMARY KEY,
+    userid INTEGER NOT NULL,
+    time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    newsids INTEGER[] 
+);
+CREATE TABLE usersearch (
+    id SERIAL PRIMARY KEY,
+    userId INTEGER NOT NULL,
+    searchId INTEGER NOT NULL REFERENCES search(id) ON DELETE CASCADE,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    newsId INTEGER REFERENCES news(id) ON DELETE SET NULL
+);
+CREATE TABLE search (
+    id SERIAL PRIMARY KEY,
+    userId INTEGER NOT NULL,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    content TEXT
+);
+CREATE TABLE searchMetaData (
+    id INTEGER PRIMARY KEY REFERENCES search(id) ON DELETE CASCADE,
+    keywords TEXT[],
+    tags TEXT[]
+);
+CREATE TABLE userMonitor (
+    id INTEGER PRIMARY KEY REFERENCES search(id) ON DELETE CASCADE,
+    userId INTEGER NOT NULL,
+    newsID INTEGER NOT NULL,
+    screenTime INTEGER NOT NULL,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
