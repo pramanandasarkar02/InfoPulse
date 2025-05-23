@@ -17,8 +17,8 @@ services:
     image: postgres:latest
     container_name: postgres_newsmetadatadb
     environment:
-      POSTGRES_DB: newsmetadatadb
-      POSTGRES_USER: admin
+      POSTGRES_DB: NewsMetaData
+      POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
     volumes:
       - postgres_data:/var/lib/postgresql/data

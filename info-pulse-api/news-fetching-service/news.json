@@ -1,146 +1,42 @@
 [
   {
     "source": {
-      "id": "associated-press",
-      "name": "Associated Press"
-    },
-    "author": "Mari Yamaguchi",
-    "title": "Japan’s agriculture minister resigns after a rice gaffe causes political fallout - AP News",
-    "description": "Japan’s agriculture minister has resigned because of political fallout over his comment that he “never had to buy rice” because he got it from supporters as gifts. Many Japanese saw his remark as a sign he was out of touch with economic reality while prices o…",
-    "url": "https://apnews.com/article/japan-rice-a01060f60874ec7fa8a24edf7917d779",
-    "urlToImage": "https://dims.apnews.com/dims4/default/6cd7264/2147483647/strip/true/crop/5000x2813+0+503/resize/1440x810!/quality/90/?url=https%3A%2F%2Fassets.apnews.com%2F96%2Fea%2F0d4129c67ab3749ba90ee0472731%2Fe107ae82558d486380f2782f8afcf2c5",
-    "publishedAt": "2025-05-21T05:27:00Z",
-    "content": "TOKYO (AP) Japans agriculture minister was forced to resign Wednesday because of political fallout over recent comments that he never had to buy rice because he got it from supporters as gifts. The r… [+3977 chars]"
-  },
-  {
-    "source": {
       "id": null,
       "name": "CBS Sports"
     },
     "author": "",
-    "title": "Thunder vs. Timberwolves schedule, odds, times, where to watch Western Conference finals, live stream playoffs - CBS Sports",
-    "description": "The 2025 Western Conference finals get started Tuesday night in Oklahoma City",
-    "url": "https://www.cbssports.com/nba/news/thunder-vs-timberwolves-schedule-odds-times-where-to-watch-western-conference-finals-live-stream-playoffs/",
-    "urlToImage": "https://sportshub.cbsistatic.com/i/r/2025/05/21/028ea0a7-34a7-4d34-999b-8eb917ee83a5/thumbnail/1200x675/32bdd7426656f690b2225ab80aa8c528/wolves-thunder-getty.png",
-    "publishedAt": "2025-05-21T04:07:00Z",
-    "content": "The Oklahoma City Thunder and Minnesota Timberwolves are the two teams left standing in the West. The Thunder and Wolves are meeting in the Western Conference finals with both franchises looking for … [+2138 chars]"
-  },
-  {
-    "source": {
-      "id": "the-washington-post",
-      "name": "The Washington Post"
-    },
-    "author": "Justin Jouvenal",
-    "title": "Supreme Court for now overturns Maine official’s censure on trans sports - The Washington Post",
-    "description": "Maine lawmakers stripped voting rights from state Rep. Laurel D. Libby (R) after her online post about a transgender high school pole vaulter.",
-    "url": "https://www.washingtonpost.com/politics/2025/05/20/supreme-court-maine-transgender-sports-lawmaker-censure/",
-    "urlToImage": "https://www.washingtonpost.com/wp-apps/imrs.php?src=https://arc-anglerfish-washpost-prod-washpost.s3.amazonaws.com/public/YVYQ5X3G5ICCOL7TB6OV2KM7W4_size-normalized.jpg&w=1440",
-    "publishedAt": "2025-05-21T04:06:29Z",
-    "content": "The Supreme Court said Tuesday that the Maine legislature must for now restorevoting rights for a Republican lawmakerwhose online protest of transgender athletes in girls sports sparked a high-profil… [+5119 chars]"
-  },
-  {
-    "source": {
-      "id": "the-verge",
-      "name": "The Verge"
-    },
-    "author": "Tom Warren",
-    "title": "AMD’s new RX 9060 XT looks set to challenge Nvidia’s RTX 5060 - The Verge",
-    "description": "AMD is unveiling its RX 9060 XT at Computex. The RDNA 4 GPU will go head-to-head with Nvidia’s RTX 5060.",
-    "url": "https://www.theverge.com/news/670285/amd-radeon-rx-9060-xt-announcement-computex",
-    "urlToImage": "https://platform.theverge.com/wp-content/uploads/sites/2/2025/05/amd.png?quality=90&strip=all&crop=0%2C1.8839115997885%2C100%2C96.232176800423&w=1200",
-    "publishedAt": "2025-05-21T03:00:00Z",
-    "content": "AMD isnt putting a price on its latest RDNA 4 GPU, nor a release date.\r\nAMD isnt putting a price on its latest RDNA 4 GPU, nor a release date.\r\nAMD is officially announcing its Radeon RX 9060 XT GPU … [+2103 chars]"
-  },
-  {
-    "source": {
-      "id": null,
-      "name": "Deadline"
-    },
-    "author": "Armando Tinoco",
-    "title": "‘The Voice’ Season 27 Winner Crowned On NBC - Deadline",
-    "description": "Jadyn Cree, Adam David, Lucía Flores-Wiseman, Jaelen Johnson, and Renzo made it to the Season 27 finale of 'The Voice' and one was crowned the winner.",
-    "url": "http://deadline.com/2025/05/the-voice-season-27-winner-nbc-1236406827/",
-    "urlToImage": "https://deadline.com/wp-content/uploads/2025/05/the-voice-season-27-winners-finalists-nbc.jpg?w=1024",
-    "publishedAt": "2025-05-21T02:59:00Z",
-    "content": "SPOILER ALERT: This post contains details of the winner of The Voice Season 27.\r\nAfter blind auditions, battles, knockouts, playoffs, and live shows, the winner of The Voice Season 27 was finally rev… [+1799 chars]"
-  },
-  {
-    "source": {
-      "id": "the-washington-post",
-      "name": "The Washington Post"
-    },
-    "author": "Naftali Bendavid, Dan Diamond",
-    "title": "Biden’s last prostate cancer screening was in 2014, his office says - The Washington Post",
-    "description": "As Republicans question how long former president Joe Biden knew he had cancer, a spokesperson says he received the disease diagnosis last Friday.",
-    "url": "https://www.washingtonpost.com/politics/2025/05/20/biden-prostate-test-cancer/",
-    "urlToImage": "https://www.washingtonpost.com/wp-apps/imrs.php?src=https://arc-anglerfish-washpost-prod-washpost.s3.amazonaws.com/public/M4B5EDV7PIRYEUL37H6Y3T4HVA_size-normalized.JPG&w=1440",
-    "publishedAt": "2025-05-21T02:48:22Z",
-    "content": "Former president Joe Bidens last known screening for prostate cancer was in 2014, when he was 71 years old and serving as vice president, a spokesperson for Bidens office said on Tuesday.\r\nIt is not … [+2162 chars]"
-  },
-  {
-    "source": {
-      "id": "axios",
-      "name": "Axios"
-    },
-    "author": "Andrew Solender",
-    "title": "Biden's deterioration unnerved House Democrats as early as 2023, new book reveals - Axios",
-    "description": "One House Democrat observed on an April 2023 trip to Ireland that Biden \"wasn't merely physically frail; he had lost almost all of his energy.\"",
-    "url": "https://www.axios.com/2025/05/20/biden-house-democrats-age-book-original-sin",
-    "urlToImage": "https://images.axios.com/oFJzbAD0wTaS0ByK-snibZIPIuU=/0x765:5239x3712/1366x768/2025/05/13/1747153480192.jpg",
-    "publishedAt": "2025-05-21T02:35:18Z",
-    "content": "Some of the first House Democrats to call for former President Biden to drop his reelection bid in 2024 saw firsthand signs of his deterioration as early as 2023, according to a new book by CNN's Jak… [+3800 chars]"
+    "title": "Knicks vs. Pacers schedule, odds, game times: Eastern Conference finals dates, TV coverage - CBS Sports",
+    "description": "The Knicks and Pacers are meeting in the playoffs once again in 2025",
+    "url": "https://www.cbssports.com/nba/news/knicks-vs-pacers-schedule-odds-game-times-eastern-conference-finals-dates-tv-coverage/",
+    "urlToImage": "https://sportshub.cbsistatic.com/i/r/2025/05/22/7830d5ee-c5a2-4a19-8ba9-a8e65f6f91a2/thumbnail/1200x675/61f3ac1692e26451384385013debc599/knicks-pacers-g1-getty.png",
+    "publishedAt": "2025-05-22T06:00:00Z",
+    "content": "The New York Knicks and Indiana Pacers are meeting once again in the playoffs, and this time there is an NBA finals berth on the line. The New York-Indiana postseason rivalry is writing its newest ch… [+1975 chars]"
   },
   {
     "source": {
       "id": "cnn",
       "name": "CNN"
     },
-    "author": "Evan Perez",
-    "title": "Justice Department opens investigation into former New York Gov. Andrew Cuomo - CNN",
-    "description": "The Justice Department has opened an investigation into Andrew Cuomo, former New York governor and a top candidate for New York City mayor, following a referral from congressional Republicans who accused Cuomo of lying during an investigation of his administr…",
-    "url": "https://www.cnn.com/2025/05/20/politics/andrew-cuomo-department-of-justice-investigation",
-    "urlToImage": "https://media.cnn.com/api/v1/images/stellar/prod/150325082132-social-gfx-breaking-news.jpg?c=16x9&q=w_800,c_fill",
-    "publishedAt": "2025-05-21T02:33:00Z",
-    "content": "The Justice Department has opened an investigation into Andrew Cuomo, former New York governor and a top candidate for New York City mayor, following a referral from congressional Republicans who acc… [+3816 chars]"
+    "author": "Alex Marquardt, Gabe Cohen, Holmes Lybrand, Kaanita Iyer, Piper Hudspeth Blackburn",
+    "title": "Two Israeli Embassy staff members killed outside Jewish museum in Washington, DC - CNN",
+    "description": "Two staff members at the Israeli Embassy in Washington, DC, were killed Wednesday night near the Capital Jewish Museum, Secretary of Homeland Security Kristi Noem said.",
+    "url": "https://www.cnn.com/2025/05/21/politics/individuals-connected-to-israeli-embassy-shot-in-dc-sources-says",
+    "urlToImage": "https://media.cnn.com/api/v1/images/stellar/prod/2025-05-22t040527z-772263343-rc2smeat0kyt-rtrmadp-3-washington-shooting-israel.jpg?c=16x9&q=w_800,c_fill",
+    "publishedAt": "2025-05-22T04:40:00Z",
+    "content": "Two staff members at the Israeli Embassy in Washington, DC, were killed Wednesday night near the Capital Jewish Museum, Secretary of Homeland Security Kristi Noem said.\r\nTwo Israeli Embassy staff wer… [+3067 chars]"
   },
   {
     "source": {
-      "id": "associated-press",
-      "name": "Associated Press"
+      "id": "the-washington-post",
+      "name": "The Washington Post"
     },
-    "author": "Jack Brook, Sara Cline",
-    "title": "Arrested New Orleans jail worker says he helped inmates escape after stabbing threat - AP News",
-    "description": "Authorities have arrested an Orleans Parish Sheriff's Office maintenance worker in connection with the escape of 10 jail inmates. Thirty-three-year-old Sterling Williams has admitted he turned the water off in a cell before the men slipped away through a hole…",
-    "url": "https://apnews.com/article/new-orleans-jail-escape-inmates-arrest-45f2a4be028254cc2587f50deb9af44d",
-    "urlToImage": "https://dims.apnews.com/dims4/default/4dc6856/2147483647/strip/true/crop/3036x1708+0+161/resize/1440x810!/quality/90/?url=https%3A%2F%2Fassets.apnews.com%2F7e%2Fec%2F57c88130691c2ff74811d79e9d03%2Fa3b6873af7f041eeb13919037927e2d4",
-    "publishedAt": "2025-05-21T02:30:00Z",
-    "content": "NEW ORLEANS (AP) A New Orleans jail maintenance worker has been arrested and is being held on a $1.1 million bond after admitting he turned water off to a toilet covering a hole in a cell wall, allow… [+6736 chars]"
-  },
-  {
-    "source": {
-      "id": "nbc-news",
-      "name": "NBC News"
-    },
-    "author": "Allan Smith",
-    "title": "Democratic challenger defeats Pittsburgh mayor in a primary, after a clash over the party's future - NBC News",
-    "description": "Allegheny County Controller Corey O’Connor defeated Pittsburgh Mayor Ed Gainey in the city’s hotly contested Democratic mayoral primary, The Associated Press projected Tuesday.",
-    "url": "https://www.nbcnews.com/politics/elections/democratic-challenger-defeats-pittsburgh-mayor-primary-clash-partys-fu-rcna207690",
-    "urlToImage": "https://media-cldnry.s-nbcnews.com/image/upload/t_nbcnews-fp-1200-630,f_auto,q_auto:best/rockcms/2025-05/250520-ed-gainey-corey-o-connor-mn-1000-ec4f37.jpg",
-    "publishedAt": "2025-05-21T02:13:00Z",
-    "content": "Allegheny County Controller Corey OConnor defeated Pittsburgh Mayor Ed Gainey in the citys hotly contested Democratic mayoral primary, The Associated Press projected Tuesday, after a race which garne… [+2565 chars]"
-  },
-  {
-    "source": {
-      "id": null,
-      "name": "NPR"
-    },
-    "author": "",
-    "title": "Judge questions government lawyers over alleged deportations to South Sudan - NPR",
-    "description": "A Massachusetts federal judge questioned whether deportations of people to countries other than their own violated his prior court order.",
-    "url": "https://www.npr.org/2025/05/20/g-s1-68090/dhs-migrants-deport-south-sudan",
-    "urlToImage": "https://npr.brightspotcdn.com/dims3/default/strip/false/crop/3798x2136+0+198/resize/1400/quality/100/format/jpeg/?url=http%3A%2F%2Fnpr-brightspot.s3.amazonaws.com%2F0c%2F11%2F9ad8520d4377b279ff89da86ed3b%2Fgettyimages-2198762855-4.jpg",
-    "publishedAt": "2025-05-21T02:10:31Z",
-    "content": "A federal judge in Massachusetts questioned the Department of Homeland Security on Tuesday about whether it had deported any migrants to South Sudan.\r\nThe judge, Brian Murphy, had in April barred any… [+5201 chars]"
+    "author": "Maria Sacchetti, Marianne LeVine",
+    "title": "Judge says Trump administration violated court orders with South Sudan deportations - The Washington Post",
+    "description": "U.S. District Judge Brian E. Murphy said the removals violated his prior order that migrants be given time to challenge their deportations to countries where they are not citizens",
+    "url": "https://www.washingtonpost.com/immigration/2025/05/21/trump-south-sudan-deportations-judge/",
+    "urlToImage": "https://www.washingtonpost.com/wp-apps/imrs.php?src=https://arc-anglerfish-washpost-prod-washpost.s3.amazonaws.com/public/BH7K6DAPNXMCCGO5BWJGKSIXPA_size-normalized.jpg&w=1440",
+    "publishedAt": "2025-05-22T04:05:24Z",
+    "content": "A federal judge in Massachusetts said Wednesday that the Trump administration violated a court order by attempting to deport several migrants to South Sudan and ordered U.S. officials to interview th… [+10419 chars]"
   },
   {
     "source": {
@@ -148,64 +44,103 @@
       "name": "BBC News"
     },
     "author": null,
-    "title": "Fortnite back on US Apple app store after five years - BBC",
-    "description": "It was removed in 2020 for violating Apple's policies by launching its own in-app payment system.",
-    "url": "https://www.bbc.com/news/articles/c0711mrl470o",
-    "urlToImage": "https://ichef.bbci.co.uk/news/1024/branded_news/d6cf/live/eac36920-35f5-11f0-a42a-596eb5326f2d.jpg",
-    "publishedAt": "2025-05-21T02:04:11Z",
-    "content": "Popular video game Fortnite is now available on Apple's app store in the US after being taken off the platform nearly five years ago.\r\nThe title was removed in August 2020 for violating Apple's polic… [+1822 chars]"
+    "title": "Nike to hike prices as it faces tariffs uncertainty - BBC",
+    "description": "The sportswear giant said the adjustments are part of \"seasonal planning\" and did not mention Trump's tariffs.",
+    "url": "https://www.bbc.com/news/articles/c3315er3gygo",
+    "urlToImage": "https://ichef.bbci.co.uk/news/1024/branded_news/297b/live/737cf710-36b7-11f0-b95c-b1e7b0ca3a7e.jpg",
+    "publishedAt": "2025-05-22T03:24:00Z",
+    "content": "Nike says it will raise the prices of some products from 1 June, with the increases hitting everything from shoes to clothing.\r\nThe sportswear giant says it is making the changes as part of \"seasonal… [+2157 chars]"
   },
   {
     "source": {
       "id": null,
-      "name": "CNBC"
+      "name": "Investor's Business Daily"
     },
-    "author": "Michael Wayland",
-    "title": "Toyota redesigns America's top-selling RAV4 SUV to exclusively be a hybrid - CNBC",
-    "description": "Toyota Motor will offer the 2026 RAV4 only as a hybrid or plug-in hybrid, eliminating a traditional gas engine in the vehicle.",
-    "url": "https://www.cnbc.com/2025/05/20/toyota-2026-rav4-hybrid.html",
-    "urlToImage": "https://image.cnbcfm.com/api/v1/image/108148250-1747768797659-RAV4.JPG?v=1747768950&w=1920&h=1080",
-    "publishedAt": "2025-05-21T01:00:00Z",
-    "content": "PLANO, Texas The top-selling SUV in the United States will exclusively be offered as a hybrid model as part of a redesign of the RAV4 lineup, Toyota Motor announced Tuesday night.\r\nThe world's larges… [+5391 chars]"
+    "author": null,
+    "title": "Stocks Tumble As Yields Soar; Two Earnings Winners Late - Investor's Business Daily",
+    "description": "Growth plays such as Palantir were hard hit. Snowflake and Urban Outfitters jumped late.",
+    "url": "https://www.investors.com/market-trend/stock-market-today/dow-jones-futures-treasury-yields-spike-nvidia-palantir-tesla-killer/",
+    "urlToImage": "https://www.investors.com/wp-content/uploads/2022/06/Stock-recessionarrow-01-adobe.jpg",
+    "publishedAt": "2025-05-22T03:10:00Z",
+    "content": "Information in Investors Business Daily is for informational and educational purposes only and should not be construed as an offer, recommendation, solicitation, or rating to buy or sell securities. … [+1064 chars]"
+  },
+  {
+    "source": {
+      "id": "the-hill",
+      "name": "The Hill"
+    },
+    "author": "Mychael Schnell, Emily Brooks",
+    "title": "House Rules Committee advances Trump agenda bill after marathon 20-plus hour hearing - The Hill",
+    "description": "The House Rules Committee late Wednesday night advanced the GOP’s bill of President Trump’s legislative priorities, sending the legislation to the floor for consideration after a marathon meeting that stretched nearly 22 hours. The panel voted 8-4 to advance …",
+    "url": "https://thehill.com/homenews/house/5313061-house-rules-committee-advances-trump-agenda-bill/",
+    "urlToImage": "https://thehill.com/wp-content/uploads/sites/2/2025/05/foxxvirginia_johnsonmike_052125gn01_w.jpg?w=1280",
+    "publishedAt": "2025-05-22T03:00:00Z",
+    "content": "The House Rules Committee late Wednesday night advanced the GOPs bill of President Trumps legislative priorities, sending the legislation to the floor for consideration after a marathon meeting that … [+2952 chars]"
   },
   {
     "source": {
       "id": null,
-      "name": "Hollywood Reporter"
+      "name": "Deadline"
     },
-    "author": "McKinley Franklin",
-    "title": "Ted Danson, John Ratzenberger, Kelsey Grammer Among Those Paying Tribute to George Wendt: “He Was a True Craftsman” - The Hollywood Reporter",
-    "description": "\"For eleven years on 'Cheers,' we shared a stage, a lot of laughs and a front-row seat to one of television’s most beloved friendships,\" Ratzenberger said.",
-    "url": "http://www.hollywoodreporter.com/news/general-news/george-wendt-death-reaction-tributes-1236223032/",
-    "urlToImage": "https://www.hollywoodreporter.com/wp-content/uploads/2025/05/GettyImages-51247796-e1747771572284.jpg?w=1440&h=810&crop=1",
-    "publishedAt": "2025-05-21T00:36:28Z",
-    "content": "Hollywood and many of George Wendt’s former co-stars are paying tribute to the actor after news of his death was announced Tuesday.\r\nWendt died peacefully in his sleep at home, his family confirmed T… [+5346 chars]"
-  },
-  {
-    "source": {
-      "id": null,
-      "name": "NBCSports.com"
-    },
-    "author": "Mike Florio",
-    "title": "Owners voted 32-0 to allow active players participate in Olympic flag football - NBC Sports",
-    "description": "As of late March, the league office had some work to do to get the owners to get behind the idea of loaning active players to Olympic flag football.",
-    "url": "https://www.nbcsports.com/nfl/profootballtalk/rumor-mill/news/owners-voted-32-0-to-allow-active-players-participate-in-olympic-flag-football",
-    "urlToImage": "https://nbcsports.brightspotcdn.com/dims4/default/39b6955/2147483647/strip/true/crop/7673x4316+0+401/resize/1440x810!/quality/90/?url=https%3A%2F%2Fnbc-sports-production-nbc-sports.s3.us-east-1.amazonaws.com%2Fbrightspot%2Fb2%2F52%2F0566ed224e7084bb848151cb42c6%2Fhttps-delivery-gettyimages.com%2Fdownloads%2F2193322049",
-    "publishedAt": "2025-05-21T00:14:47Z",
-    "content": "As of late March, the league office had some work to do to get the owners to get behind the idea of loaning active players to Olympic flag football. The NFL got it done, and then some.\r\nPFT has confi… [+932 chars]"
+    "author": "Armando Tinoco",
+    "title": "‘Survivor’ Season 48 Winner Crowned On CBS - Deadline",
+    "description": "The eight jury members voted for the 'Survivor' Season 48 winner on CBS.",
+    "url": "http://deadline.com/2025/05/survivor-season-48-winner-cbs-1236408030/",
+    "urlToImage": "https://deadline.com/wp-content/uploads/2025/05/survivor-season-48-finalists-top-5.jpg?w=1024",
+    "publishedAt": "2025-05-22T02:29:00Z",
+    "content": "SPOILER ALERT: This post contains details on the Survivor Season 48 finale.\r\nSurvivor Season 48 ended, declaring one castaway the $1 million prize winner.\r\nHost Jeff Probst teased that the finale wil… [+2064 chars]"
   },
   {
     "source": {
       "id": "the-washington-post",
       "name": "The Washington Post"
     },
-    "author": "Ruby Mellen, Sarah Kaplan",
-    "title": "Earth may already be too hot for the survival of polar ice sheets - The Washington Post",
-    "description": "If Earth stays at its current levels of warming -- below policymakers’ goal of 1.5 degrees Celsius -- polar ice sheets may melt, causing seas to rise and displacing coastal communities, a study finds.",
-    "url": "https://www.washingtonpost.com/climate-environment/2025/05/20/global-warming-ice-sheets-sea-level-rise/",
-    "urlToImage": "https://www.washingtonpost.com/wp-apps/imrs.php?src=https://arc-anglerfish-washpost-prod-washpost.s3.amazonaws.com/public/KZ7WNJ74DDK2KKP2EKHJXA7BXU_size-normalized.JPG&w=1440",
-    "publishedAt": "2025-05-21T00:11:44Z",
-    "content": "Ten years ago, policymakers and nation states set the worlds most important climate goal: limiting planetary warming to 1.5 degrees Celsius (2.7 degrees Fahrenheit). If the Earth could stay below tha… [+3880 chars]"
+    "author": "Taylor Telford",
+    "title": "Target stumbles as tariffs hit earnings and sales fall amid DEI backlash - The Washington Post",
+    "description": "Target now expects a “low single-digit [percentage] decline” in sales for the fiscal year; it previously forecast 1 percent growth.",
+    "url": "https://www.washingtonpost.com/business/2025/05/21/target-earnings-foot-traffic-tariffs-dei/",
+    "urlToImage": "https://www.washingtonpost.com/wp-apps/imrs.php?src=https://arc-anglerfish-washpost-prod-washpost.s3.amazonaws.com/public/FY7LPCGCTTQVFY6TWJ55SS7EUA_size-normalized.jpg&w=1440",
+    "publishedAt": "2025-05-22T01:59:53Z",
+    "content": "Target slashed its financial outlook for the year Wednesday as it reported weaker-than-expected earnings amid tariff uncertainty and customer pullbacks tied not only to a challenging economic environ… [+6573 chars]"
+  },
+  {
+    "source": {
+      "id": "cbs-news",
+      "name": "CBS News"
+    },
+    "author": null,
+    "title": "Jim Irsay, Indianapolis Colts owner, dies at 65 - CBS News",
+    "description": "Jim Irsay, the owner and CEO of the Indianapolis Colts, died Wednesday at the age of 65, the team said in a statement.",
+    "url": "https://www.cbsnews.com/news/jim-irsay-indianapolis-colts-owner-dies/",
+    "urlToImage": "https://assets3.cbsnewsstatic.com/hub/i/r/2025/05/21/e712a808-9a4f-4430-a465-f0997df26da3/thumbnail/1200x630/2af7a27011ea37e4a2da88dc80455e17/ap21332835662877.jpg?v=f80504b4a2a31dbf7fe3bb9ae688e3d2",
+    "publishedAt": "2025-05-22T01:48:17Z",
+    "content": "Jim Irsay, the owner and CEO of the Indianapolis Colts, died on Wednesday, the team said in a statement. He was 65. \r\n\"Jim's dedication to and passion for the Indianapolis Colts in addition to his ge… [+7091 chars]"
+  },
+  {
+    "source": {
+      "id": "the-wall-street-journal",
+      "name": "The Wall Street Journal"
+    },
+    "author": null,
+    "title": "Exclusive | Trump Tells European Leaders in Private That Putin Isn’t Ready to End War - WSJ",
+    "description": null,
+    "url": "https://www.wsj.com/world/europe/trump-putin-call-russia-ukraine-83a6ef59",
+    "urlToImage": null,
+    "publishedAt": "2025-05-22T01:00:56Z",
+    "content": null
+  },
+  {
+    "source": {
+      "id": "politico",
+      "name": "Politico"
+    },
+    "author": "Megan Messerly",
+    "title": "Megabill push reveals GOP’s reluctant embrace of economic populism - Politico",
+    "description": "The bill reflects the current tension in the GOP over keeping old guard Republicans, business interests and Wall Street donors happy even as Trump challenges other elements of party orthodoxy.",
+    "url": "https://www.politico.com/news/2025/05/21/trump-gop-populism-megabill-00364187",
+    "urlToImage": "https://static.politico.com/6e/59/c47e40ea4793bdfb50043d7cb829/https-delivery-gettyimages.com/downloads/2208183423",
+    "publishedAt": "2025-05-22T01:00:00Z",
+    "content": "But it remains reflective of the GOPs heritage as a party that banks on boosting the economy by lowering rates at the top. The top 10 percent of American earners would see an increase in their bottom… [+5946 chars]"
   },
   {
     "source": {
@@ -213,38 +148,51 @@
       "name": "ABC News"
     },
     "author": "ABC News",
-    "title": "Trump unveils plans for $175B 'Golden Dome' missile defense shield - ABC News",
+    "title": "Trump showed old videos, took crosses out of context in South Africa genocide claims - ABC News",
     "description": null,
-    "url": "https://abcnews.go.com/Politics/trump-unveil-plans-us-missile-defense-shield-cost/story?id\\\\u003d121995258",
+    "url": "https://abcnews.go.com/US/trump-showed-videos-crosses-context-south-africa-genocide/story?id\\\\u003d122056100",
     "urlToImage": null,
-    "publishedAt": "2025-05-20T23:37:30Z",
+    "publishedAt": "2025-05-22T00:44:17Z",
     "content": null
-  },
-  {
-    "source": {
-      "id": "axios",
-      "name": "Axios"
-    },
-    "author": "Nathan Bomey",
-    "title": "Musk says Tesla seeing \"major rebound\" in sales - Axios",
-    "description": "Elon Musk said Tuesday that Tesla is experiencing a \"major rebound in demand\" after political blowback undermined interest in its electric vehicles.",
-    "url": "https://www.axios.com/2025/05/20/elon-musk-tesla-ev-sales-doge",
-    "urlToImage": "https://images.axios.com/T3qYbhbLJKYn62Nb8ANsx9jVWCw=/0x67:4645x2680/1366x768/2025/05/20/1747766250683.jpg",
-    "publishedAt": "2025-05-20T23:25:50Z",
-    "content": "Elon Musk said Tuesday that Tesla is experiencing a \"major rebound in demand\" after political blowback undermined interest in its electric vehicles.\r\nWhy it matters: The company's sales declined in t… [+1117 chars]"
   },
   {
     "source": {
       "id": null,
-      "name": "New York Daily News"
+      "name": "Interesting Engineering"
     },
-    "author": "Brian Niemietz",
-    "title": "Measles warning issued following Shakira concert at MetLife - New York Daily News",
-    "description": "Shakira fans who attended the singer’s Thursday show at MetLife Stadium are being warned by health officials that at least one concertgoer had the measles.",
-    "url": "https://www.nydailynews.com/2025/05/20/shakira-concert-measles-warning-metlife-stadium/",
-    "urlToImage": "https://www.nydailynews.com/wp-content/uploads/2025/05/GettyImages-2215513743.jpg?w=1024&h=683",
-    "publishedAt": "2025-05-20T23:21:15Z",
-    "content": "Shakira fans who managed to make it to MetLife Stadium are being warned that measles were also in the house last week.\r\n“The New Jersey Department of Health (NJDOH) is alerting residents about potent… [+1473 chars]"
+    "author": "Neetika Walter",
+    "title": "Tooth pain’s origins traced to 465-million-year-old armored fish with sensors - Interesting Engineering",
+    "description": "New fossil study shows teeth evolved from sensitive armor in ancient fish—solving a 500-million-year-old mystery.",
+    "url": "https://interestingengineering.com/science/the-surprising-fishy-origins-of-your-toothache",
+    "urlToImage": "https://cms.interestingengineering.com/wp-content/uploads/2025/05/ancient-fish.jpg",
+    "publishedAt": "2025-05-21T23:49:00Z",
+    "content": "But now, a new study confirms that these structures in an early vertebrate fish from the Ordovician period, about 465 million years ago, contained dentine.\r\nUsing 3D scans on fossils of the fish, res… [+696 chars]"
+  },
+  {
+    "source": {
+      "id": null,
+      "name": "BBC News"
+    },
+    "author": null,
+    "title": "Target mosquito parasites with drugs to cut malaria, study says - BBC",
+    "description": "Normally the insects are targeted with insecticide, but US researchers say anti-malaria drugs absorbed through their legs can stop them spreading disease.",
+    "url": "https://www.bbc.com/news/articles/c1j554pgjgko",
+    "urlToImage": "https://ichef.bbci.co.uk/news/1024/branded_news/9dc6/live/e95ed1a0-3659-11f0-a2c9-cb3e24c16fff.jpg",
+    "publishedAt": "2025-05-21T23:10:41Z",
+    "content": "Mosquitoes should be given malaria drugs to clear their infection so they can no longer spread the disease, say US researchers.\r\nMalaria parasites, which kill nearly 600,000 people a year, mostly chi… [+2544 chars]"
+  },
+  {
+    "source": {
+      "id": null,
+      "name": "Variety"
+    },
+    "author": "Ellise Shafer",
+    "title": "'Sentimental Value' Palme Buzz Builds With Huge 15-Minute Cannes Ovation - Variety",
+    "description": "Elle Fanning teared up as Joachim Trier and Renate Reinsve's 'Sentimental Value' earned a huge 15-minute Cannes ovation — the longest of this year's fest.",
+    "url": "https://variety.com/2025/film/news/sentimental-value-palme-buzz-cannes-ovation-1236391955/",
+    "urlToImage": "https://variety.com/wp-content/uploads/2025/05/GettyImages-2216335445.jpg?w=1000&h=563&crop=1",
+    "publishedAt": "2025-05-21T23:03:00Z",
+    "content": "Joachim Trier and star Renate Reinsve‘s “Sentimental Value” smashed past this year’s record for the longest standing ovation at Cannes on Wednesday evening, with the premiere crowd applauding the “Wo… [+2620 chars]"
   },
   {
     "source": {
@@ -252,11 +200,63 @@
       "name": "ABC News"
     },
     "author": "ABC News",
-    "title": "Rap rivalries, sex performances and assault weapons come into focus at trial of Sean 'Diddy' Combs - ABC News",
+    "title": "Sean 'Diddy' Combs trial day 12 recap: Jurors hear from expert witnesses and Diddy's former assistant - ABC News",
     "description": null,
-    "url": "https://abcnews.go.com/US/rap-rivalries-sex-performances-assault-weapons-focus-trial/story?id\\\\u003d122006717",
+    "url": "https://abcnews.go.com/US/sean-combs-trial-day-12-recap-jurors-hear/story?id\\\\u003d122050227",
     "urlToImage": null,
-    "publishedAt": "2025-05-20T23:15:38Z",
+    "publishedAt": "2025-05-21T22:42:51Z",
     "content": null
+  },
+  {
+    "source": {
+      "id": null,
+      "name": "Tipranks.com"
+    },
+    "author": "Marty Shtrubel",
+    "title": "‘Buy After Google I/O,’ Says Morgan Stanley About Alphabet Stock - TipRanks",
+    "description": "Alphabet (NASDAQ:GOOGL) stock has been under pressure in recent times, weighed down by mounting antitrust challenges and growing concerns that AI could erode its se...",
+    "url": "https://www.tipranks.com/news/buy-after-google-i-o-says-morgan-stanley-about-alphabet-stock",
+    "urlToImage": "https://blog.tipranks.com/wp-content/uploads/2025/05/GOOGL-Brian-Nowak-750x406.jpg",
+    "publishedAt": "2025-05-21T22:13:34Z",
+    "content": ""
+  },
+  {
+    "source": {
+      "id": null,
+      "name": "NBCSports.com"
+    },
+    "author": "Charean Williams",
+    "title": "Brock Purdy calls his contract extension \"a huge blessing\" - NBC Sports",
+    "description": "Brock Purdy signed his five-year, $256 million extension on Wednesday.",
+    "url": "https://www.nbcsports.com/nfl/profootballtalk/rumor-mill/news/brock-purdy-calls-his-contract-extension-a-huge-blessing",
+    "urlToImage": "https://nbcsports.brightspotcdn.com/dims4/default/5f6408e/2147483647/strip/true/crop/6000x3375+0+0/resize/1440x810!/quality/90/?url=https%3A%2F%2Fnbc-sports-production-nbc-sports.s3.us-east-1.amazonaws.com%2Fbrightspot%2F97%2F27%2Ffde14d634f218abf388d059888e9%2Fhttps-api-imagn.com%2Frest%2Fdownload%2FimageID%3D24943430",
+    "publishedAt": "2025-05-21T22:12:26Z",
+    "content": "Brock Purdy signed his five-year, $256 million extension on Wednesday.\r\nIt was a relief to the 49ers quarterback to get the deal done in the offseason.\r\nI have so much respect for everybody in this o… [+1482 chars]"
+  },
+  {
+    "source": {
+      "id": "associated-press",
+      "name": "Associated Press"
+    },
+    "author": "Lolita Baldor",
+    "title": "Defense Department accepts Boeing 747 from Qatar for Trump’s use - AP News",
+    "description": "The Pentagon says Defense Secretary Pete Hegseth has accepted a gifted Boeing 747 from Qatar for President Donald Trump to use as Air Force One. Pentagon spokesman Sean Parnell said Wednesday that the department will “work to ensure proper security measures” …",
+    "url": "https://apnews.com/article/trump-qatar-air-force-one-gift-plane-c4e1d73c3dbe18397c10e3d3d267bcd6",
+    "urlToImage": "https://dims.apnews.com/dims4/default/0bb810d/2147483647/strip/true/crop/4505x2534+0+235/resize/1440x810!/quality/90/?url=https%3A%2F%2Fassets.apnews.com%2Fba%2F88%2F6eb23c0a9719485ade637f02df3b%2F544e008651bd498b93cba817ea0280ef",
+    "publishedAt": "2025-05-21T21:56:00Z",
+    "content": "WASHINGTON (AP) Defense Secretary Pete Hegseth has accepted a luxury Boeing 747 jet from Qatar for President Donald Trump to use as Air Force One, the Pentagon said Wednesday, despite ongoing questio… [+4082 chars]"
+  },
+  {
+    "source": {
+      "id": "associated-press",
+      "name": "Associated Press"
+    },
+    "author": "Wafaa Shurafa, Samy Magdy, Melanie Lidman",
+    "title": "Netanyahu promises new Gaza aid delivery plan as supplies still fail to reach Palestinians - AP News",
+    "description": "The U.N. says it is trying to get the desperately needed aid that has entered Gaza this week into the hands of Palestinians. There are delays because of fears of looting and Israeli military restrictions. Meanwhile, Israeli Prime Minister Benjamin Netanyahu s…",
+    "url": "https://apnews.com/article/israel-palestinians-hamas-war-news-hostages-05-21-2025-11444e8b684b983dbb64daa5854b7b14",
+    "urlToImage": "https://dims.apnews.com/dims4/default/c9edac4/2147483647/strip/true/crop/8640x4860+0+450/resize/1440x810!/quality/90/?url=https%3A%2F%2Fassets.apnews.com%2F74%2Fab%2Fe1d03d4195f1547005055e051590%2F8a2cfe5a891c433b84cd25c3544dcc33",
+    "publishedAt": "2025-05-21T21:39:00Z",
+    "content": "DEIR AL-BALAH, Gaza (AP) The U.N. said Wednesday it was trying to get the desperately needed aid that has entered Gaza this week into the hands of Palestinians amid delays because of fears of looting… [+8161 chars]"
   }
 ]
