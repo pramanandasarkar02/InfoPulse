@@ -10,7 +10,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@google/generative-ai": "^0.7.1"
-  },
-  "type": "module"
+    "@google/generative-ai": "^0.7.1",
+    "cheerio": "^1.0.0",
+    "node-fetch": "^2.7.0"
+  }
 }
