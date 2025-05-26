@@ -4,7 +4,7 @@ import NewsCard, { type NewsItem } from '../components/NewsCard';
 type RawNewsItem = {
   title: string;
   description: string;
-  content?: string;
+  content: string;
   publishedAt: string;
   url: string;
   [key: string]: any; 
@@ -15,7 +15,7 @@ const processNews = (rawNews: RawNewsItem[]): NewsItem[] => {
     id: Math.random().toString(36).substring(2, 9),
     title: news.title,
     summary: news.description,
-    content: news.content || news.description,
+    content: news.content, 
     publishDate: news.publishedAt,
     url: news.url
   }));

@@ -49,7 +49,7 @@ const NewsCard: React.FC<NewsCardProps> = ({ item }) => {
         </button>
       </div>
       
-      <p className="text-gray-600 mb-3">{item.summary}</p>
+      <p className="text-gray-600 mb-3">{item.content}</p>
       
       <div className="flex items-center justify-between text-sm text-gray-500">
         <span>{new Date(item.publishDate).toLocaleDateString()}</span>
