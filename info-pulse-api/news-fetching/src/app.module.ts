@@ -3,6 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { NewsModule } from './news/news.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [ MongooseModule.forRoot(
@@ -11,6 +12,7 @@ import { NewsModule } from './news/news.module';
         dbName: 'newsdb'
       },
     ), NewsModule,
+    ScheduleModule.forRoot()
   ],
   controllers: [AppController],
   providers: [AppService],

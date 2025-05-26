@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import NewsCard, { type NewsItem } from '../components/NewsCard';
 import sampleNews from '../assets/news.json';
 
@@ -25,7 +25,11 @@ const processNews = (rawNews: RawNewsItem[]): NewsItem[] => {
 type Props = {};
 
 const Explore: React.FC<Props> = () => {
+  
+
   const displayedNews = processNews(sampleNews);
+
+
 
   return (
     <div className="container mx-auto px-4 py-8">
