@@ -13,6 +13,11 @@ export class AppController {
     return this.appService.getHello();
   }
 
+  @Get("ping")
+  getPing(): string {
+    return "pong";
+  }
+
   @Post('news')
   async createNews(@Body() createNewsDto: CreateNewsDto): Promise<News> {
     return this.appService.createNews(createNewsDto);
