@@ -2,13 +2,23 @@ import React, { useState } from 'react';
 import { NewsCard } from './NewsCard';
 import { LoadingSpinner } from './LoadingSpinner';
 import { NewsArticle } from '../types';
+import { AlertCircle, RefreshCw } from 'lucide-react';
 
 interface NewsFeedProps {
   articles: NewsArticle[];
   onArticleClick: (article: NewsArticle) => void;
+  loading?: boolean;
+  error?: string | null;
+  onRefresh?: () => void;
 }
 
-export const NewsFeed: React.FC<NewsFeedProps> = ({ articles, onArticleClick }) => {
+export const NewsFeed: React.FC<NewsFeedProps> = ({ 
+  articles, 
+  onArticleClick, 
+  loading = false, 
+  error = null,
+  onRefresh
+}) => {
   const [loadingMore, setLoadingMore] = useState(false);
   const [displayedArticles, setDisplayedArticles] = useState(10);
 
@@ -23,19 +33,68 @@ export const NewsFeed: React.FC<NewsFeedProps> = ({ articles, onArticleClick }) 
   const visibleArticles = articles.slice(0, displayedArticles);
   const hasMore = displayedArticles < articles.length;
 
+  if (loading) {
+    return (
+      <div className="max-w-4xl mx-auto p-6">
+        <div className="flex items-center justify-center min-h-96">
+          <div className="text-center">
+            <LoadingSpinner size="large" className="mx-auto mb-4" />
+            <p className="text-gray-600 dark:text-gray-400">Loading your personalized news feed...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="max-w-4xl mx-auto p-6">
+        <div className="flex items-center justify-center min-h-96">
+          <div className="text-center">
+            <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+              Failed to Load News
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400 mb-4">{error}</p>
+            {onRefresh && (
+              <button
+                onClick={onRefresh}
+                className="flex items-center space-x-2 px-4 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors duration-200"
+              >
+                <RefreshCw className="h-4 w-4" />
+                <span>Try Again</span>
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (articles.length === 0) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-24 h-24 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
-            <span className="text-4xl">📰</span>
+      <div className="max-w-4xl mx-auto p-6">
+        <div className="flex items-center justify-center min-h-96">
+          <div className="text-center">
+            <div className="w-24 h-24 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span className="text-4xl">📰</span>
+            </div>
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+              No articles found
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400 mb-4">
+              Try adjusting your search or filters to find more content.
+            </p>
+            {onRefresh && (
+              <button
+                onClick={onRefresh}
+                className="flex items-center space-x-2 px-4 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors duration-200"
+              >
+                <RefreshCw className="h-4 w-4" />
+                <span>Refresh</span>
+              </button>
+            )}
           </div>
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-            No articles found
-          </h3>
-          <p className="text-gray-600 dark:text-gray-400">
-            Try adjusting your search or filters to find more content.
-          </p>
         </div>
       </div>
     );

@@ -10,6 +10,7 @@ export interface NewsArticle {
   tags: string[];
   source: string;
   readTime: number;
+  url?: string; // Added URL field for original article link
   isFavorited?: boolean;
 }
 

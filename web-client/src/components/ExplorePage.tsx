@@ -1,16 +1,26 @@
 import React, { useState, useMemo } from 'react';
-import { Search, TrendingUp, Globe, Filter } from 'lucide-react';
+import { Search, TrendingUp, Globe, Filter, AlertCircle, RefreshCw } from 'lucide-react';
 import { NewsCard } from './NewsCard';
 import { LoadingSpinner } from './LoadingSpinner';
 import { NewsArticle, SearchFilters } from '../types';
-import { categories } from '../data/mockNews';
 
 interface ExplorePageProps {
   articles: NewsArticle[];
   onArticleClick: (article: NewsArticle) => void;
+  availableCategories: string[];
+  loading?: boolean;
+  error?: string | null;
+  onRefresh?: () => void;
 }
 
-export const ExplorePage: React.FC<ExplorePageProps> = ({ articles, onArticleClick }) => {
+export const ExplorePage: React.FC<ExplorePageProps> = ({ 
+  articles, 
+  onArticleClick, 
+  availableCategories,
+  loading = false,
+  error = null,
+  onRefresh
+}) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [sortBy, setSortBy] = useState<'newest' | 'trending' | 'popular'>('newest');
@@ -27,9 +37,11 @@ export const ExplorePage: React.FC<ExplorePageProps> = ({ articles, onArticleCli
         article =>
           article.title.toLowerCase().includes(query) ||
           article.summary.toLowerCase().includes(query) ||
+          article.content.toLowerCase().includes(query) ||
           article.tags.some(tag => tag.toLowerCase().includes(query)) ||
           article.author.toLowerCase().includes(query) ||
-          article.category.toLowerCase().includes(query)
+          article.category.toLowerCase().includes(query) ||
+          article.source.toLowerCase().includes(query)
       );
     }
 
@@ -69,17 +81,78 @@ export const ExplorePage: React.FC<ExplorePageProps> = ({ articles, onArticleCli
   const visibleArticles = filteredArticles.slice(0, displayedArticles);
   const hasMore = displayedArticles < filteredArticles.length;
 
-  const trendingTopics = ['AI', 'Climate', 'Technology', 'Healthcare', 'Space', 'Finance'];
+  // Get trending topics from article tags
+  const trendingTopics = useMemo(() => {
+    const tagCounts: { [key: string]: number } = {};
+    articles.forEach(article => {
+      article.tags.forEach(tag => {
+        tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+      });
+    });
+    
+    return Object.entries(tagCounts)
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, 8)
+      .map(([tag]) => tag);
+  }, [articles]);
+
+  if (loading) {
+    return (
+      <div className="max-w-7xl mx-auto p-6">
+        <div className="flex items-center justify-center min-h-96">
+          <div className="text-center">
+            <LoadingSpinner size="large" className="mx-auto mb-4" />
+            <p className="text-gray-600 dark:text-gray-400">Loading latest news...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="max-w-7xl mx-auto p-6">
+        <div className="flex items-center justify-center min-h-96">
+          <div className="text-center">
+            <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+              Failed to Load News
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400 mb-4">{error}</p>
+            {onRefresh && (
+              <button
+                onClick={onRefresh}
+                className="px-4 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors duration-200"
+              >
+                Try Again
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto p-6">
       {/* Header Section */}
       <div className="mb-8">
-        <div className="flex items-center space-x-3 mb-4">
-          <Globe className="h-8 w-8 text-gray-600 dark:text-gray-400" />
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            Explore News
-          </h1>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center space-x-3">
+            <Globe className="h-8 w-8 text-gray-600 dark:text-gray-400" />
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+              Explore News
+            </h1>
+          </div>
+          {onRefresh && (
+            <button
+              onClick={onRefresh}
+              className="flex items-center space-x-2 px-4 py-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200"
+            >
+              <RefreshCw className="h-4 w-4" />
+              <span>Refresh</span>
+            </button>
+          )}
         </div>
         <p className="text-gray-600 dark:text-gray-400 text-lg">
           Discover the latest stories from around the world
@@ -114,7 +187,7 @@ export const ExplorePage: React.FC<ExplorePageProps> = ({ articles, onArticleCli
                 className="px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-gray-500"
               >
                 <option value="">All Categories</option>
-                {categories.map(category => (
+                {availableCategories.map(category => (
                   <option key={category} value={category}>{category}</option>
                 ))}
               </select>
@@ -146,23 +219,25 @@ export const ExplorePage: React.FC<ExplorePageProps> = ({ articles, onArticleCli
           </div>
 
           {/* Trending Topics */}
-          <div>
-            <div className="flex items-center space-x-2 mb-3">
-              <TrendingUp className="h-4 w-4 text-gray-500" />
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Trending Topics</span>
+          {trendingTopics.length > 0 && (
+            <div>
+              <div className="flex items-center space-x-2 mb-3">
+                <TrendingUp className="h-4 w-4 text-gray-500" />
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Trending Topics</span>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {trendingTopics.map(topic => (
+                  <button
+                    key={topic}
+                    onClick={() => setSearchQuery(topic)}
+                    className="px-3 py-1 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 rounded-full text-sm hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200"
+                  >
+                    #{topic}
+                  </button>
+                ))}
+              </div>
             </div>
-            <div className="flex flex-wrap gap-2">
-              {trendingTopics.map(topic => (
-                <button
-                  key={topic}
-                  onClick={() => setSearchQuery(topic)}
-                  className="px-3 py-1 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 rounded-full text-sm hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200"
-                >
-                  #{topic}
-                </button>
-              ))}
-            </div>
-          </div>
+          )}
         </div>
       </div>
 

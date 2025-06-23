@@ -7,12 +7,25 @@ import { ArticleDetail } from './components/ArticleDetail';
 import { FavoritesPage } from './components/FavoritesPage';
 import { SettingsPage } from './components/SettingsPage';
 import { AuthModal } from './components/AuthModal';
+import { LoadingSpinner } from './components/LoadingSpinner';
 import { useNews } from './hooks/useNews';
 import { useAuth } from './hooks/useAuth';
 import { NewsArticle, CurrentPage } from './types';
 
 function App() {
-  const { articles, favoriteArticles, filters, setFilters, preferences, setPreferences } = useNews();
+  const { 
+    articles, 
+    favoriteArticles, 
+    availableCategories,
+    filters, 
+    setFilters, 
+    preferences, 
+    setPreferences,
+    loading,
+    error,
+    refreshArticles
+  } = useNews();
+  
   const { user, isAuthenticated, isLoading, login, register, logout } = useAuth();
   const [currentPage, setCurrentPage] = useState<CurrentPage>('feed');
   const [selectedArticle, setSelectedArticle] = useState<NewsArticle | null>(null);
@@ -43,7 +56,11 @@ function App() {
         return (
           <ExplorePage
             articles={articles}
+            availableCategories={availableCategories}
             onArticleClick={handleArticleClick}
+            loading={loading}
+            error={error}
+            onRefresh={refreshArticles}
           />
         );
       case 'favorites':
@@ -52,6 +69,8 @@ function App() {
             <NewsFeed
               articles={articles}
               onArticleClick={handleArticleClick}
+              loading={loading}
+              error={error}
             />
           );
         }
@@ -67,6 +86,8 @@ function App() {
             <NewsFeed
               articles={articles}
               onArticleClick={handleArticleClick}
+              loading={loading}
+              error={error}
             />
           );
         }
@@ -88,6 +109,8 @@ function App() {
           <NewsFeed
             articles={articles}
             onArticleClick={handleArticleClick}
+            loading={loading}
+            error={error}
           />
         );
     }
@@ -100,6 +123,7 @@ function App() {
           <div className="w-8 h-8 bg-gray-900 dark:bg-white rounded-lg flex items-center justify-center mx-auto mb-4">
             <span className="text-white dark:text-gray-900 font-bold text-sm">IP</span>
           </div>
+          <LoadingSpinner size="medium" className="mx-auto mb-4" />
           <p className="text-gray-600 dark:text-gray-400">Loading InfoPulse...</p>
         </div>
       </div>
@@ -126,6 +150,9 @@ function App() {
             filters={filters}
             onFiltersChange={setFilters}
             onClose={() => setSidebarOpen(false)}
+            availableCategories={availableCategories}
+            onRefresh={refreshArticles}
+            isRefreshing={loading}
           />
         )}
         

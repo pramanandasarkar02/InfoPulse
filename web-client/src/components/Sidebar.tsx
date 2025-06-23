@@ -1,13 +1,15 @@
 import React from 'react';
-import { X, Filter, Calendar } from 'lucide-react';
+import { X, Filter, Calendar, RefreshCw } from 'lucide-react';
 import { SearchFilters } from '../types';
-import { categories } from '../data/mockNews';
 
 interface SidebarProps {
   isOpen: boolean;
   filters: SearchFilters;
   onFiltersChange: (filters: SearchFilters) => void;
   onClose: () => void;
+  availableCategories: string[];
+  onRefresh?: () => void;
+  isRefreshing?: boolean;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -15,6 +17,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
   filters,
   onFiltersChange,
   onClose,
+  availableCategories,
+  onRefresh,
+  isRefreshing = false,
 }) => {
   const handleCategoryChange = (category: string) => {
     onFiltersChange({ ...filters, category: category === filters.category ? '' : category });
@@ -56,6 +61,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </button>
           </div>
 
+          {/* Refresh Button */}
+          {onRefresh && (
+            <div>
+              <button
+                onClick={onRefresh}
+                disabled={isRefreshing}
+                className="w-full flex items-center justify-center space-x-2 px-4 py-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+              >
+                <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+                <span>{isRefreshing ? 'Refreshing...' : 'Refresh Articles'}</span>
+              </button>
+            </div>
+          )}
+
           {/* Categories */}
           <div>
             <div className="flex items-center space-x-2 mb-4">
@@ -73,7 +92,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               >
                 All Categories
               </button>
-              {categories.map(category => (
+              {availableCategories.map(category => (
                 <button
                   key={category}
                   onClick={() => handleCategoryChange(category)}
