@@ -1,20 +1,30 @@
+// news/news.service.ts (Alternative with exceptions)
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { News } from './news.schema';
 import { CreateNewsDto } from './create-news.dto';
 import { UpdateNewsDto } from './update-news.dto';
+import { News, NewsDocument } from './news.schema';
 
 @Injectable()
 export class NewsService {
-  constructor(@InjectModel(News.name) private newsModel: Model<News>) {}
+  constructor(
+    @InjectModel(News.name) private newsModel: Model<NewsDocument>,
+  ) {}
 
   async createNews(createNewsDto: CreateNewsDto): Promise<News> {
-    const newNews = new this.newsModel({
-      ...createNewsDto,
+    const newsData = {
+      title: createNewsDto.title,
+      url: createNewsDto.url,
+      summery: createNewsDto.summary || 'No summary available', // Ensure it's never empty
+      content: createNewsDto.content,
+      images: createNewsDto.images || [],
+      keywords: createNewsDto.keywords || [],
       insertionDate: new Date(),
-    });
-    return newNews.save();
+    };
+
+    const createdNews = new this.newsModel(newsData);
+    return createdNews.save();
   }
 
   async findAll(): Promise<News[]> {
@@ -30,12 +40,22 @@ export class NewsService {
   }
 
   async updateNews(id: string, updateNewsDto: UpdateNewsDto): Promise<News> {
+    const updateData: any = { ...updateNewsDto };
+    
+    // Map 'summary' to 'summery' if provided
+    if (updateNewsDto.summary) {
+      updateData.summery = updateNewsDto.summary;
+      delete updateData.summary;
+    }
+
     const updatedNews = await this.newsModel
-      .findByIdAndUpdate(id, { $set: updateNewsDto }, { new: true })
+      .findByIdAndUpdate(id, updateData, { new: true })
       .exec();
+    
     if (!updatedNews) {
       throw new NotFoundException(`News article with ID ${id} not found`);
     }
+    
     return updatedNews;
   }
 
@@ -44,5 +64,24 @@ export class NewsService {
     if (!result) {
       throw new NotFoundException(`News article with ID ${id} not found`);
     }
+  }
+
+  // Additional utility methods
+  async findByUrl(url: string): Promise<News | null> {
+    return this.newsModel.findOne({ url }).exec();
+  }
+
+  async findByKeywords(keywords: string[]): Promise<News[]> {
+    return this.newsModel
+      .find({ keywords: { $in: keywords } })
+      .exec();
+  }
+
+  async getLatestNews(limit: number = 10): Promise<News[]> {
+    return this.newsModel
+      .find()
+      .sort({ insertionDate: -1 })
+      .limit(limit)
+      .exec();
   }
 }

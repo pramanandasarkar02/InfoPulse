@@ -1,9 +1,9 @@
+// app.module.ts
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
 import { MongooseModule } from '@nestjs/mongoose';
+import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { Article, ArticleSchema } from './article.schema';
-
 
 @Module({
   imports: [

@@ -1,119 +1,23 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { CreateNewsDto } from './news/create-news.dto';
-import { News } from './news/news.schema';
-import { NewsService } from './news/news.service';
-import { UpdateNewsDto } from './news/update-news.dto';
 import { Interval } from '@nestjs/schedule';
 import axios from 'axios';
-import * as cheerio from 'cheerio'; // Added missing cheerio import
+
+interface Article {
+  id: string;
+  title: string;
+  url: string;
+  content: string;
+  rawHtml: string;
+  insertionDate: Date;
+}
 
 @Injectable()
 export class AppService {
   private readonly logger = new Logger(AppService.name);
 
-  constructor(private readonly newsService: NewsService) {}
-
-  getHello(): string {
-    return 'Hello World!';
-  }
-
-  // Create a news article
-  async createNews(createNewsDto: CreateNewsDto): Promise<News> {
-    return this.newsService.createNews(createNewsDto);
-  }
-
-  // Get all news articles
-  async getAllNews(): Promise<News[]> {
-    return this.newsService.findAll();
-  }
-
-  // Get a single news article by ID
-  async getNewsById(id: string): Promise<News> {
-    return this.newsService.findOne(id);
-  }
-
-  // Update a news article by ID
-  async updateNews(id: string, updateNewsDto: UpdateNewsDto): Promise<News> {
-    return this.newsService.updateNews(id, updateNewsDto);
-  }
-
-  // Delete a news article by ID
-  async deleteNews(id: string): Promise<void> {
-    return this.newsService.deleteNews(id);
-  }
-
-  // Fixed method with proper typing and error handling
-  async extractNewsContent(url: string): Promise<string> {
-    try {
-      // Fetch the webpage
-      const response = await fetch(url, {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-        }
-      });
-
-      // Log response for debugging
-      console.log('Response Status:', response.status, response.statusText);
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-
-      // Get the HTML content
-      const html = await response.text();
-      
-      // Load HTML into cheerio
-      const $ = cheerio.load(html);
-      
-      // Common selectors for article content, prioritized for AP News
-      const articleSelectors = [
-        'div.Article', // Common for AP News
-        'div[itemprop="articleBody"]',
-        'article',
-        '.article-body',
-        '.entry-content',
-        '.post-content',
-        '.content'
-      ];
-      
-      let content = '';
-      
-      // Try each selector until content is found
-      for (const selector of articleSelectors) {
-        const article = $(selector).text().trim();
-        if (article) {
-          content = article;
-          break;
-        }
-      }
-      
-      // Fallback: extract from paragraph tags, excluding noise
-      if (!content) {
-        content = $('p')
-          .not('.caption, .advertisement, .meta, .footer, .sidebar')
-          .map((i, el) => $(el).text().trim())
-          .get()
-          .filter(text => text.length > 20)
-          .join('\n\n');
-      }
-      
-      // Clean up excessive whitespace
-      content = content.replace(/\s+/g, ' ').trim();
-      
-      if (!content) {
-        return 'No article content found. The website may use a non-standard structure or block scraping.';
-      }
-      
-      return content;
-    } catch (error) {
-      console.error('Error:', error instanceof Error ? error.message : 'Unknown error');
-      return 'Failed to fetch or parse the content. Possible issues: CORS, paywall, or invalid URL.';
-    }
-  }
-
   @Interval(10000)
   async handleCron(): Promise<void> {
-    this.logger.debug('Attempting to fetch news articles...');
+    this.logger.debug('Fetching news articles...');
     await this.fetchNews();
   }
 
@@ -122,50 +26,133 @@ export class AppService {
       const response = await axios.get('https://newsapi.org/v2/top-headlines', {
         params: {
           country: 'us',
-          apiKey: '44f17ecced324b8e9b8492a08c407eb3', 
+          apiKey: '44f17ecced324b8e9b8492a08c407eb3',
         },
       });
 
       const articles = response.data.articles;
-      this.logger.log(`[NewsFetcher] Fetched ${articles.length} articles from NewsAPI.`);
-
-      let newArticlesCount = 0;
-      let duplicateCount = 0;
-      let errorCount = 0;
+      this.logger.log(`Fetched ${articles.length} articles from NewsAPI`);
 
       for (const article of articles) {
         try {
-          const content = await this.extractNewsContent(article.url);
-
-          const createNewsDto: CreateNewsDto = {
-            title: article.title,
-            content: content,
-            url: article.url
+          // Fetch raw HTML content
+          const rawHtml = await this.fetchRawHtml(article.url);
+          
+          // Prepare article data
+          const articleData: Article = {
+            id: this.generateId(),
+            title: article.title || 'Untitled Article',
+            url: article.url || '',
+            content: article.description || '',
+            rawHtml: rawHtml,
+            insertionDate: new Date(),
           };
+
+          // Send to processing service
+          await this.sendToProcessingService(articleData);
           
-          await this.newsService.createNews(createNewsDto);
-          newArticlesCount++;
-          this.logger.debug(`[NewsFetcher] Successfully saved new article: ${article.title}`);
-          
-        } catch (articleError) {
-          // Check if it's a duplicate key error
-          if (articleError instanceof Error && articleError.message.includes('E11000 duplicate key error')) {
-            duplicateCount++;
-            this.logger.debug(`[NewsFetcher] Duplicate article skipped: ${article.title}`);
-          } else {
-            errorCount++;
-            this.logger.error(`[NewsFetcher] Failed to process article: ${article.title}`, articleError instanceof Error ? articleError.message : 'Unknown error');
-          }
+        } catch (error) {
+          this.logger.error(`Failed to process article: ${article.title}`, 
+            error instanceof Error ? error.message : 'Unknown error');
         }
       }
       
-      this.logger.log(`[NewsFetcher] Processing complete - New: ${newArticlesCount}, Duplicates: ${duplicateCount}, Errors: ${errorCount}, Total fetched: ${articles.length}`);
-
     } catch (error) {
-      this.logger.error('[NewsFetcher] Failed to fetch or save news:', error instanceof Error ? error.message : 'Unknown error');
-      if (axios.isAxiosError(error) && error.response) {
-        this.logger.error(`[NewsFetcher] NewsAPI Error Response Data: ${JSON.stringify(error.response.data)}`);
-      }
+      this.logger.error('Failed to fetch news from API:', 
+        error instanceof Error ? error.message : 'Unknown error');
     }
+  }
+
+  private async fetchRawHtml(url: string): Promise<string> {
+    try {
+      const response = await fetch(url, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const html = await response.text();
+      
+      // Limit HTML size to prevent payload too large errors (max 1MB)
+      const maxSize = 1024 * 1024; // 1MB
+      if (html.length > maxSize) {
+        this.logger.warn(`HTML content too large (${html.length} chars), truncating to ${maxSize} chars`);
+        return html.substring(0, maxSize) + '<!-- TRUNCATED -->';
+      }
+      
+      return html;
+    } catch (error) {
+      this.logger.warn(`Failed to fetch HTML for ${url}:`, 
+        error instanceof Error ? error.message : 'Unknown error');
+      return '';
+    }
+  }
+
+  private async sendToProcessingService(article: Article): Promise<void> {
+    try {
+      // Check payload size before sending
+      const payload = JSON.stringify(article);
+      const payloadSize = Buffer.byteLength(payload, 'utf8');
+      const maxPayloadSize = 10 * 1024 * 1024; // 10MB limit
+      
+      if (payloadSize > maxPayloadSize) {
+        this.logger.warn(`Payload too large (${payloadSize} bytes), truncating HTML content`);
+        // Truncate HTML content if payload is too large
+        const truncatedHtml = article.rawHtml.substring(0, 500000) + '<!-- TRUNCATED DUE TO SIZE -->';
+        article = { ...article, rawHtml: truncatedHtml };
+      }
+
+      const response = await fetch('http://localhost:3001/articles', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Content-Length': Buffer.byteLength(JSON.stringify(article), 'utf8').toString()
+        },
+        body: JSON.stringify(article),
+      });
+
+      if (!response.ok) {
+        if (response.status === 413) {
+          // Still too large, send without HTML
+          this.logger.warn(`Payload still too large, sending without HTML content`);
+          const articleWithoutHtml = { ...article, rawHtml: '' };
+          await this.sendArticleWithoutHtml(articleWithoutHtml);
+          return;
+        }
+        throw new Error(`Failed to send article: ${response.statusText}`);
+      }
+
+      this.logger.debug(`Successfully sent article: ${article.title}`);
+    } catch (error) {
+      this.logger.error(`Error sending article to processing service:`, 
+        error instanceof Error ? error.message : 'Unknown error');
+    }
+  }
+
+  private async sendArticleWithoutHtml(article: Article): Promise<void> {
+    try {
+      const response = await fetch('http://localhost:3001/articles', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(article),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to send article without HTML: ${response.statusText}`);
+      }
+
+      this.logger.debug(`Successfully sent article without HTML: ${article.title}`);
+    } catch (error) {
+      this.logger.error(`Error sending article without HTML:`, 
+        error instanceof Error ? error.message : 'Unknown error');
+    }
+  }
+
+  private generateId(): string {
+    return Date.now().toString() + Math.random().toString(36).substr(2, 9);
   }
 }

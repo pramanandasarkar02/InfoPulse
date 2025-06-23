@@ -1,8 +1,11 @@
-import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
+// news/news.schema.ts
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
+export type NewsDocument = News & Document;
+
 @Schema({ timestamps: true })
-export class News extends Document {
+export class News {
   @Prop({ required: true })
   title: string;
 
@@ -10,9 +13,18 @@ export class News extends Document {
   url: string;
 
   @Prop({ required: true })
+  summery: string; // Note: keeping the typo 'summery' as in your interface
+
+  @Prop({ required: true })
   content: string;
 
-  @Prop({ type: Date, default: Date.now })
+  @Prop({ type: [String], default: [] })
+  images: string[];
+
+  @Prop({ type: [String], default: [] })
+  keywords: string[];
+
+  @Prop({ default: Date.now })
   insertionDate: Date;
 }
 

@@ -1,15 +1,5 @@
-import { IsString, IsUrl, IsOptional } from 'class-validator';
+// news/update-news.dto.ts
+import { PartialType } from '@nestjs/mapped-types';
+import { CreateNewsDto } from './create-news.dto';
 
-export class UpdateNewsDto {
-  @IsString()
-  @IsOptional()
-  title?: string;
-
-  @IsUrl()
-  @IsOptional()
-  url?: string;
-
-  @IsString()
-  @IsOptional()
-  content?: string;
-}
+export class UpdateNewsDto extends PartialType(CreateNewsDto) {}
