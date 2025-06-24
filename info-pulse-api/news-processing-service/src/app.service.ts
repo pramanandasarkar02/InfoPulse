@@ -230,7 +230,7 @@ export class AppService {
       return null;
     }
 
-    const prompt = `Create a comprehensive summary of the following news article in 3-5 sentences. Include key details, context, and important implications. Make it informative and complete: 
+    const prompt = `Create a comprehensive summary of the following news article in 4-5 paragraph and about 1000+ words. Include key details, context, and important implications. Make it informative and complete: 
 
 ${text}`;
     
@@ -243,7 +243,7 @@ ${text}`;
       return null;
     }
 
-    const prompt = `Create a very brief summary of the following news article in 1-2 sentences. Focus only on the most essential information: 
+    const prompt = `Create a very brief summary of the following news article in 4-5 sentences. Focus only on the most essential information: 
 
 ${text}`;
     
