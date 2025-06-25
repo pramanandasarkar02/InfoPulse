@@ -19,6 +19,11 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      - name: Install Docker Compose
+        run: |
+          sudo curl -L "https://github.com/docker/compose/releases/download/v2.20.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+          sudo chmod +x /usr/local/bin/docker-compose
+
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
@@ -28,46 +33,5 @@ jobs:
       - name: Build Docker images
         run: docker-compose build
 
-      - name: Run tests
-        run: |
-          # Add test commands here (e.g., for Node.js services)
-          cd ./info-pulse-api/news-fetching-service && pnpm test
-          cd ./info-pulse-api/news-processing-service && pnpm test
-          cd ./web-client && npm test
-        # Note: Ensure your projects have test scripts defined in package.json
-
-  cd:
-    runs-on: ubuntu-latest
-    needs: ci
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Build and push Docker images
-        run: |
-          docker-compose build
-          docker-compose push
-
-      - name: Deploy to Server
-        # Replace with your deployment method (e.g., SSH to a server)
-        run: |
-          echo "Deploying to production server..."
-          # Example SSH deployment (requires SSH setup)
-          # ssh user@your-server "cd /path/to/project && docker-compose pull && docker-compose up -d"
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          SERVER_ADDRESS: ${{ secrets.SERVER_ADDRESS }}
-          SERVER_USER: ${{ secrets.SERVER_USER }}
+      - name: Push Docker images
+        run: docker-compose push
