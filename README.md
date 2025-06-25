@@ -1,2 +1,5 @@
 # news-recommendation-app
 project for CSE 408
+dckr_pat_TT9Y7PZE_BV13EfJGWKxI1bRHoM
+dckr_pat_TT9Y7PZE_BV13EfJGWKxI1bRHoM
+dckr_pat_TT9Y7PZE_BV13EfJGWKxI1bRHoM
