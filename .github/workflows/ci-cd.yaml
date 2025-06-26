@@ -35,3 +35,16 @@ jobs:
 
       - name: Push Docker images
         run: docker-compose push
+      - name: Deploy to Azure VM
+        env:
+          AZURE_VM_IP: ${{ secrets.AZURE_VM_IP }}
+          AZURE_VM_USERNAME: ${{ secrets.AZURE_VM_USERNAME }}
+          AZURE_VM_SSH_PRIVATE_KEY: ${{ secrets.AZURE_VM_SSH_PRIVATE_KEY }}
+        run: |
+          echo "$AZURE_VM_SSH_PRIVATE_KEY" > private_key
+          chmod 600 private_key
+          ssh -o StrictHostKeyChecking=no -i private_key $AZURE_VM_USERNAME@$AZURE_VM_IP << 'EOF'
+            # Create project directory if it doesn't exist
+            mkdir -p ~/info-pulse
+            cd ~/info-pulse
+      
