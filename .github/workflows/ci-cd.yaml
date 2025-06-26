@@ -45,6 +45,9 @@ jobs:
           chmod 600 private_key
           ssh -o StrictHostKeyChecking=no -i private_key $AZURE_VM_USERNAME@$AZURE_VM_IP << 'EOF'
             # Create project directory if it doesn't exist
-            mkdir -p ~/info-pulse
-            cd ~/info-pulse
+            git clone https://github.com/pramanandasarkar02/InfoPulse.git
+            # Run Docker Compose in detached mode
+            cd InfoPulse
+            docker compose up -d
+          EOF
       
