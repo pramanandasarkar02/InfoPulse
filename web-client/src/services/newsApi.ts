@@ -15,7 +15,7 @@ interface ApiNewsArticle {
   __v: number;
 }
 
-const API_BASE_URL = 'http://localhost:3001';
+const API_BASE_URL = 'http://localhost:4042';
 
 export class NewsApiService {
   private static transformArticle(apiArticle: ApiNewsArticle): NewsArticle {

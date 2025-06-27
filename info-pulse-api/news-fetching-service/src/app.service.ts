@@ -418,7 +418,7 @@ export class AppService implements OnModuleInit {
   private async sendLightArticle(article: Article): Promise<void> {
     try {
       await axios.post(
-        process.env.PROCESSING_SERVICE_URL || 'http://localhost:3001/articles',
+        process.env.PROCESSING_SERVICE_URL || 'http://localhost:4042/articles',
         article,
         {
           timeout: 30000,
