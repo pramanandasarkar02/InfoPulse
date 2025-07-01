@@ -23,12 +23,12 @@ app.use(limiter);
 
 // Service URLs from Docker Compose configuration
 const services = {
-  newsfetching: 'http://newsfetching:3001',
-  newsprocessing: 'http://newsprocessing:3002',
-  userservice: 'http://userservice:3003',
-  usersearching: 'http://usersearching:3004',
-  newsrecommendation: 'http://newsrecommendation:3005',
-  usermonitoring: 'http://usermonitoring:3006'
+  newsfetching: 'http://localhost:4041',
+  newsprocessing: 'http://localhost:4042',
+  userservice: 'http://localhost:4043',
+  usersearching: 'http://localhost:4044',
+  newsrecommendation: 'http://localhost:4045',
+  usermonitoring: 'http://localhost:4046'
 };
 
 // Proxy middleware options
