@@ -6,7 +6,7 @@ services:
       context: ./info-pulse-api/news-fetching-service
       dockerfile: Dockerfile
     ports:
-      - "4041:3000"
+      - "4041:3001"
     environment:
       - NODE_ENV=production
     restart: unless-stopped
@@ -16,10 +16,56 @@ services:
       context: ./info-pulse-api/news-processing-service
       dockerfile: Dockerfile
     ports:
+      - "4042:3002"
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+  userservice:
+    build:
+      context: ./info-pulse-api/user-service
+      dockerfile: Dockerfile
+    ports:
+      - "4042:3003"      
+    restart: unless-stopped
+  usersearching:
+    build:
+      context: ./info-pulse-api/news-searching-service
+      dockerfile: Dockerfile
+    ports:
+      - "4042:3004"
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+  newsrecommendation:
+    build:
+      context: ./info-pulse-api/news-recommendation-service
+      dockerfile: Dockerfile
+    ports:
+      - "4042:3005"
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+  usermonitoring:
+    build:
+      context: ./info-pulse-api/news-monitoring-service
+      dockerfile: Dockerfile
+    ports:
+      - "4042:3006"
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+
+  apigateway:
+    build:
+      context: ./info-pulse-api/api-gateway
+      dockerfile: Dockerfile
+    ports:
       - "4042:3000"
     environment:
       - NODE_ENV=production
     restart: unless-stopped
+
+  
 
   frontend:
     build:
