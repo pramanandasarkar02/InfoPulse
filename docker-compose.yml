@@ -1,4 +1,4 @@
-version: '3.8'
+
 
 services:
   newsfetching:
@@ -29,21 +29,21 @@ services:
     restart: unless-stopped
   usersearching:
     build:
-      context: ./info-pulse-api/news-searching-service
+      context: ./info-pulse-api/user-searching-service
       dockerfile: Dockerfile
     ports:
       - "4044:3004"
     restart: unless-stopped
   newsrecommendation:
     build:
-      context: ./info-pulse-api/news-recommendation-service
+      context: ./info-pulse-api/user-recommendation-service
       dockerfile: Dockerfile
     ports:
       - "4045:3005"
     restart: unless-stopped
   usermonitoring:
     build:
-      context: ./info-pulse-api/news-monitoring-service
+      context: ./info-pulse-api/user-monitoring-service
       dockerfile: Dockerfile
     ports:
       - "4046:3006"
