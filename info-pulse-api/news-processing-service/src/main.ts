@@ -12,6 +12,6 @@ async function bootstrap() {
   app.use(json({ limit: '50mb' }));
   app.use(urlencoded({ extended: true, limit: '50mb' }));
   
-  await app.listen(3001);
+  await app.listen(3002);
 }
 bootstrap();
