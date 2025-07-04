@@ -20,6 +20,26 @@ services:
       - NODE_ENV=production
     restart: unless-stopped
 
+  postgres:
+    image: postgres:14-alpine
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=S3cret
+      - POSTGRES_USER=pguser
+      - POSTGRES_DB=user-db
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pguser -d user-db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - app-network
+
+  # Express API Server
   userservice:
     build:
       context: ./info-pulse-api/user-service
@@ -27,8 +47,19 @@ services:
     ports:
       - "3003:3003"
     environment:
-      - NODE_ENV=production
+      - PORT=3003
+      - JWT_SECRET=no_secret
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=user-db
+      - DB_USER=pguser
+      - DB_PASSWORD=S3cret
+    depends_on:
+      postgres:
+        condition: service_healthy
     restart: unless-stopped
+    networks:
+      - app-network
 
   # usersearching:
   #   build:
@@ -75,23 +106,16 @@ services:
       context: ./web-client
       dockerfile: Dockerfile
     ports:
-      - "5050:5050"
+      - "5173:5173"
     environment:
       - NODE_ENV=production
-      - API_BASE_URL=http://localhost:4042
+      - API_BASE_URL=http://localhost:3002
     restart: unless-stopped
 
-  postgres:
-    image: postgres:14-alpine
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    environment:
-      - POSTGRES_PASSWORD=S3cret
-      - POSTGRES_USER=pguser
-      - POSTGRES_DB=user-db
-    restart: unless-stopped
-
+  
 volumes:
   postgres_data:
+
+networks:
+  app-network:
+    driver: bridge
