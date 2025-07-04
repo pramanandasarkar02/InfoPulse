@@ -1,18 +1,18 @@
-import { Entity, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn } from 'typeorm';
-import { User } from './user.entity';
-import { Topic } from './topic.entity';
+// import { Entity, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn } from 'typeorm';
+// import { User } from './user.entity';
+// import { Topic } from './topic.entity';
 
-@Entity('user_topics')
-export class UserTopic {
-  @PrimaryGeneratedColumn()
-  id: number;
+// @Entity('user_topics')
+// export class UserTopic {
+//   @PrimaryGeneratedColumn()
+//   id: number;
 
-  @ManyToOne(() => User, user => user.userTopics)
-  user: User;
+//   @ManyToOne(() => User, user => user.userTopics)
+//   user: User;
 
-  @ManyToOne(() => Topic, topic => topic.userTopics)
-  topic: Topic;
+//   @ManyToOne(() => Topic, topic => topic.userTopics)
+//   topic: Topic;
 
-  @CreateDateColumn()
-  createdAt: Date;
-}
+//   @CreateDateColumn()
+//   createdAt: Date;
+// }
