@@ -1,14 +1,16 @@
-
-FROM node:20-alpine
+# Stage 1: Build the application
+FROM node:20-alpine AS builder
 WORKDIR /app
 COPY package*.json ./
-
-RUN npm install
-
+RUN npm ci --omit=dev
 COPY . .
-
 RUN npm run build
 
-EXPOSE 5173
-
-CMD ["npm", "run", "dev"]
+# Stage 2: Serve the application
+FROM node:20-alpine
+WORKDIR /app
+RUN npm install -g serve
+COPY --from=builder /app/dist ./dist
+EXPOSE 5050
+ENV NODE_ENV=production
+CMD ["serve", "-s", "dist", "-l", "5050"]
