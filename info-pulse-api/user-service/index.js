@@ -6,7 +6,7 @@ const cors = require('cors');
 require('dotenv').config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3003; // Match Docker Compose PORT
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
 // Middleware
@@ -33,24 +33,20 @@ const DEFAULT_USERS = [
   { username: 'lisa_davis', email: 'lisa@example.com', password: 'password123', is_admin: false },
   { username: 'robert_miller', email: 'robert@example.com', password: 'password123', is_admin: false },
   { username: 'emily_taylor', email: 'emily@example.com', password: 'password123', is_admin: false },
-  { username: 'james_anderson', email: 'james@example.com', password: 'password123', is_admin: false }
+  { username: 'james_anderson', email: 'james@example.com', password: 'password123', is_admin: false },
+];
 
-]
-  // Default news categories
+// Default news categories
 const DEFAULT_CATEGORIES = [
   'Politics', 'Technology', 'Sports', 'Entertainment', 'Business',
   'Health', 'Science', 'World News', 'Local News', 'Weather',
   'Education', 'Travel', 'Food', 'Fashion', 'Automotive',
-  'Real Estate', 'Finance', 'Gaming', 'Music', 'Movies'
+  'Real Estate', 'Finance', 'Gaming', 'Music', 'Movies',
 ];
 
 // Initialize database
 async function initializeDatabase() {
   try {
-    // Wait for database connection
-    await pool.connect();
-    console.log('Connected to PostgreSQL database');
-
     // Create users table
     await pool.query(`
       CREATE TABLE IF NOT EXISTS users (
@@ -105,7 +101,8 @@ async function initializeDatabase() {
         if (existingUser.rows.length === 0) {
           // Hash password
           const hashedPassword = await bcrypt.hash(user.password, 10);
-          
+
+
           // Create user
           const result = await pool.query(
             'INSERT INTO users (username, email, password, is_admin) VALUES ($1, $2, $3, $4) RETURNING id',
@@ -122,7 +119,7 @@ async function initializeDatabase() {
 
             for (const category of defaultCategories.rows) {
               await pool.query(
-                'INSERT INTO user_topics (user_id, category_id) VALUES ($1, $2)',
+                'INSERT INTO user_topics (user_id, category_id) VALUES ($1, $2) ON CONFLICT DO NOTHING',
                 [newUserId, category.id]
               );
             }
@@ -139,9 +136,8 @@ async function initializeDatabase() {
 
     console.log('Database initialized successfully');
   } catch (error) {
-    console.error('Database initialization error:', error);
-    // Retry connection after 5 seconds
-    setTimeout(initializeDatabase, 5000);
+    console.error('Database initialization error:', error.message);
+    throw error; // Rethrow to handle in server startup
   }
 }
 
@@ -173,7 +169,7 @@ const requireAdmin = (req, res, next) => {
 
 // Routes
 
-// User Registration
+// User_registration
 app.post('/api/register', async (req, res) => {
   try {
     const { username, email, password, is_admin = false } = req.body;
@@ -210,7 +206,7 @@ app.post('/api/register', async (req, res) => {
 
     for (const category of defaultCategories.rows) {
       await pool.query(
-        'INSERT INTO user_topics (user_id, category_id) VALUES ($1, $2)',
+        'INSERT INTO user_topics (user_id, category_id) VALUES ($1, $2) ON CONFLICT DO NOTHING',
         [newUser.id, category.id]
       );
     }
@@ -221,11 +217,11 @@ app.post('/api/register', async (req, res) => {
         id: newUser.id,
         username: newUser.username,
         email: newUser.email,
-        is_admin: newUser.is_admin
-      }
+        is_admin: newUser.is_admin,
+      },
     });
   } catch (error) {
-    console.error('Registration error:', error);
+    console.error('Registration error:', error.message);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -260,10 +256,10 @@ app.post('/api/login', async (req, res) => {
 
     // Generate JWT token
     const token = jwt.sign(
-      { 
-        id: user.id, 
-        username: user.username, 
-        is_admin: user.is_admin 
+      {
+        id: user.id,
+        username: user.username,
+        is_admin: user.is_admin,
       },
       JWT_SECRET,
       { expiresIn: '24h' }
@@ -276,11 +272,11 @@ app.post('/api/login', async (req, res) => {
         id: user.id,
         username: user.username,
         email: user.email,
-        is_admin: user.is_admin
-      }
+        is_admin: user.is_admin,
+      },
     });
   } catch (error) {
-    console.error('Login error:', error);
+    console.error('Login error:', error.message);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -299,7 +295,7 @@ app.get('/api/profile', authenticateToken, async (req, res) => {
 
     res.json({ user: result.rows[0] });
   } catch (error) {
-    console.error('Profile error:', error);
+    console.error('Profile error:', error.message);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -310,7 +306,7 @@ app.get('/api/categories', authenticateToken, async (req, res) => {
     const result = await pool.query('SELECT id, name FROM news_categories ORDER BY name');
     res.json({ categories: result.rows });
   } catch (error) {
-    console.error('Categories error:', error);
+    console.error('Categories error:', error.message);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -318,17 +314,20 @@ app.get('/api/categories', authenticateToken, async (req, res) => {
 // Get user's selected topics
 app.get('/api/my-topics', authenticateToken, async (req, res) => {
   try {
-    const result = await pool.query(`
+    const result = await pool.query(
+      `
       SELECT nc.id, nc.name 
       FROM news_categories nc
       JOIN user_topics ut ON nc.id = ut.category_id
       WHERE ut.user_id = $1
       ORDER BY nc.name
-    `, [req.user.id]);
+    `,
+      [req.user.id]
+    );
 
     res.json({ topics: result.rows });
   } catch (error) {
-    console.error('User topics error:', error);
+    console.error('User topics error:', error.message);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -343,19 +342,19 @@ app.put('/api/my-topics', authenticateToken, async (req, res) => {
     }
 
     // Remove existing topics
-    await pool.query('DELETE FROM user_topics WHERE user_id = $1', [req.user.id]);
+    await pool.query('DELETE FROM user sexuales WHERE user_id = $1', [req.user.id]);
 
     // Add new topics
     for (const categoryId of category_ids) {
       await pool.query(
-        'INSERT INTO user_topics (user_id, category_id) VALUES ($1, $2)',
+        'INSERT INTO user_topics (user_id, category_id) VALUES ($1, $2) ON CONFLICT DO NOTHING',
         [req.user.id, categoryId]
       );
     }
 
     res.json({ message: 'Topics updated successfully' });
   } catch (error) {
-    console.error('Update topics error:', error);
+    console.error('Update topics error:', error.message);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -370,7 +369,7 @@ app.get('/api/admin/users', authenticateToken, requireAdmin, async (req, res) =>
     );
     res.json({ users: result.rows });
   } catch (error) {
-    console.error('Admin users error:', error);
+    console.error('Admin users error:', error.message);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -388,7 +387,7 @@ app.delete('/api/admin/users/:id', authenticateToken, requireAdmin, async (req, 
 
     res.json({ message: 'User deleted successfully' });
   } catch (error) {
-    console.error('Delete user error:', error);
+    console.error('Delete user error:', error.message);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -407,15 +406,16 @@ app.post('/api/admin/categories', authenticateToken, requireAdmin, async (req, r
       [name]
     );
 
-    res.status(201).json({ 
+    res.status(201).json({
       message: 'Category created successfully',
-      category: result.rows[0]
+      category: result.rows[0],
     });
   } catch (error) {
-    if (error.code === '23505') { // Unique constraint violation
+    if (error.code === '23505') {
+      // Unique constraint violation
       return res.status(409).json({ error: 'Category already exists' });
     }
-    console.error('Add category error:', error);
+    console.error('Add category error:', error.message);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -425,7 +425,9 @@ app.delete('/api/admin/categories/:id', authenticateToken, requireAdmin, async (
   try {
     const { id } = req.params;
 
-    const result = await pool.query('DELETE FROM news_categories WHERE id = $1 RETURNING id', [id]);
+    const result = await pool.query('DELETE FROM news_categories WHERE id = $1 RETURNING id', [
+      id,
+    ]);
 
     if (result.rows.length === 0) {
       return res.status(404).json({ error: 'Category not found' });
@@ -433,7 +435,7 @@ app.delete('/api/admin/categories/:id', authenticateToken, requireAdmin, async (
 
     res.json({ message: 'Category deleted successfully' });
   } catch (error) {
-    console.error('Delete category error:', error);
+    console.error('Delete category error:', error.message);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -444,9 +446,18 @@ app.get('/health', (req, res) => {
 });
 
 // Start server
-app.listen(PORT, async () => {
-  await initializeDatabase();
-  console.log(`Server running on port ${PORT}`);
-});
+async function startServer() {
+  try {
+    await initializeDatabase();
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error('Failed to start server:', error.message);
+    process.exit(1); // Exit on failure to prevent restarts
+  }
+}
+
+startServer();
 
 module.exports = app;

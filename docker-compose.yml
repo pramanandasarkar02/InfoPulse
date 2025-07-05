@@ -61,35 +61,34 @@ services:
     networks:
       - app-network
 
-  # usersearching:
-  #   build:
-  #     context: ./info-pulse-api/user-searching-service
-  #     dockerfile: Dockerfile
-  #   ports:
-  #     - "4044:3004" # Match internal port with Dockerfile CMD
-  #   environment:
-  #     - PYTHONUNBUFFERED=1
-  #   restart: unless-stopped
+  usersearching:
+    build:
+      context: ./info-pulse-api/user-searching-service
+      dockerfile: Dockerfile
+    ports:
+      - "3004:3004" 
+    environment:
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
 
-  # newsrecommendation:
-  #   build:
-  #     context: ./info-pulse-api/user-recommendation-service
-  #     dockerfile: Dockerfile
-  #   ports:
-  #     - "4045:3005" # Match internal port with Dockerfile CMD
-  #   environment:
-  #     - PYTHONUNBUFFERED=1
-  #   restart: unless-stopped
+  newsrecommendation:
+    build:
+      context: ./info-pulse-api/user-recommendation-service
+      dockerfile: Dockerfile
+    ports:
+      - "3005:3005" # Match internal port with Dockerfile CMD
+    environment:
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
 
-  # usermonitoring:
-  #   build:
-  #     context: ./info-pulse-api/user-monitoring-service
-  #     dockerfile: Dockerfile
-  #   ports:
-  #     - "4046:3006"
-  #   environment:
-  #     - NODE_ENV=production
-  #   restart: unless-stopped
+  usermonitoring:
+    build:
+      context: ./info-pulse-api/user-monitoring-service
+      dockerfile: Dockerfile
+    ports:
+      - "3006:3006"
+    
+    restart: unless-stopped
 
   # apigateway:
   #   build:
@@ -109,7 +108,6 @@ services:
       - "5173:5173"
     environment:
       - NODE_ENV=production
-      - API_BASE_URL=http://localhost:3002
     restart: unless-stopped
 
   
