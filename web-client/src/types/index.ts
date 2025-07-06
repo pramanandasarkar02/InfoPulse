@@ -10,7 +10,7 @@ export interface NewsArticle {
   tags: string[];
   source: string;
   readTime: number;
-  url?: string; // Added URL field for original article link
+  url?: string;
   isFavorited?: boolean;
 }
 
@@ -30,10 +30,10 @@ export interface SearchFilters {
 
 export interface User {
   id: string;
+  username: string;
   email: string;
-  name: string;
-  avatar?: string;
-  createdAt: string;
+  is_admin: boolean;
+  created_at: string;
 }
 
 export interface AuthState {
@@ -42,4 +42,4 @@ export interface AuthState {
   isLoading: boolean;
 }
 
-export type CurrentPage = 'feed' | 'explore' | 'favorites' | 'settings' | 'article';
+export type CurrentPage = 'feed' | 'explore' | 'favorites' | 'settings' | 'article' | 'admin' | 'upload';

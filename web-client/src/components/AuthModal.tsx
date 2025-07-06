@@ -5,8 +5,9 @@ import { LoadingSpinner } from './LoadingSpinner';
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onLogin: (email: string, password: string) => Promise<boolean>;
-  onRegister: (name: string, email: string, password: string) => Promise<boolean>;
+  onLogin: (username: string, password: string) => Promise<boolean>;
+  onRegister: (username: string, email: string, password: string) => Promise<boolean>;
+  error: string | null;
 }
 
 export const AuthModal: React.FC<AuthModalProps> = ({
@@ -14,43 +15,33 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   onClose,
   onLogin,
   onRegister,
+  error,
 }) => {
   const [isLoginMode, setIsLoginMode] = useState(true);
   const [formData, setFormData] = useState({
-    name: '',
+    username: '',
     email: '',
     password: '',
   });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
 
   if (!isOpen) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setError('');
 
-    try {
-      let success = false;
-      if (isLoginMode) {
-        success = await onLogin(formData.email, formData.password);
-      } else {
-        success = await onRegister(formData.name, formData.email, formData.password);
-      }
+    const success = isLoginMode
+      ? await onLogin(formData.username, formData.password)
+      : await onRegister(formData.username, formData.email, formData.password);
 
-      if (success) {
-        onClose();
-        setFormData({ name: '', email: '', password: '' });
-      } else {
-        setError(isLoginMode ? 'Invalid credentials' : 'Registration failed');
-      }
-    } catch (err) {
-      setError('An error occurred. Please try again.');
-    } finally {
-      setIsLoading(false);
+    if (success) {
+      setFormData({ username: '', email: '', password: '' });
+      onClose();
     }
+
+    setIsLoading(false);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -58,7 +49,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       ...prev,
       [e.target.name]: e.target.value,
     }));
-    setError('');
   };
 
   return (
@@ -77,43 +67,45 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          {!isLoginMode && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Full Name
-              </label>
-              <div className="relative">
-                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  placeholder="Enter your full name"
-                  required={!isLoginMode}
-                />
-              </div>
-            </div>
-          )}
-
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Email Address
+              Username
             </label>
             <div className="relative">
-              <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
               <input
-                type="email"
-                name="email"
-                value={formData.email}
+                type="text"
+                name="username"
+                value={formData.username}
                 onChange={handleInputChange}
                 className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                placeholder="Enter your email"
+                placeholder="Enter your username"
                 required
               />
             </div>
           </div>
+
+          {!isLoginMode && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Email Address
+              </label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                 
+
+ placeholder="Enter your email"
+                  required
+                />
+              </div>
+            </div>
+          )}
 
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -129,7 +121,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 className="w-full pl-10 pr-12 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 placeholder="Enter your password"
                 required
-                minLength={6}
+                minLength={2}
               />
               <button
                 type="button"
@@ -167,8 +159,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               type="button"
               onClick={() => {
                 setIsLoginMode(!isLoginMode);
-                setError('');
-                setFormData({ name: '', email: '', password: '' });
+                setFormData({ username: '', email: '', password: '' });
               }}
               className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white text-sm"
             >

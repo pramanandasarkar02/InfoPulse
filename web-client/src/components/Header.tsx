@@ -1,6 +1,7 @@
+
 import React, { useState, useEffect } from 'react';
-import { Search, Menu, Heart, Settings, Home, Moon, Sun, User, LogOut, Globe, Sparkles } from 'lucide-react';
-import { SearchFilters, User as UserType, CurrentPage } from '../types';
+import { Search, Menu, Heart, Settings, Home, Moon, Sun, LogOut, Globe, Sparkles, Shield, Upload } from 'lucide-react';
+import { SearchFilters, User, CurrentPage } from '../types';
 
 interface HeaderProps {
   filters: SearchFilters;
@@ -8,7 +9,7 @@ interface HeaderProps {
   currentPage: CurrentPage;
   onPageChange: (page: CurrentPage) => void;
   onToggleSidebar: () => void;
-  user: UserType | null;
+  user: User | null;
   onAuthClick: () => void;
   onLogout: () => void;
 }
@@ -25,8 +26,10 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   const [darkMode, setDarkMode] = useState(() => {
     if (typeof window !== 'undefined') {
-      return localStorage.getItem('theme') === 'dark' || 
-             (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      return (
+        localStorage.getItem('theme') === 'dark' ||
+        (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)
+      );
     }
     return false;
   });
@@ -63,7 +66,7 @@ export const Header: React.FC<HeaderProps> = ({
             >
               <Menu className="h-6 w-6" />
             </button>
-            
+
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-sm">
                 <Sparkles className="h-6 w-6 text-white" />
@@ -84,12 +87,16 @@ export const Header: React.FC<HeaderProps> = ({
             <div className="flex-1 max-w-2xl mx-6">
               <div className={`relative transition-all duration-300 ${searchFocused ? 'scale-[1.02]' : ''}`}>
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <Search className={`h-5 w-5 transition-colors duration-200 ${searchFocused ? 'text-blue-500' : 'text-gray-400'}`} />
+                  <Search
+                    className={`h-5 w-5 transition-colors duration-200 ${
+                      searchFocused ? 'text-blue-500' : 'text-gray-400'
+                    }`}
+                  />
                 </div>
                 <input
                   type="text"
                   value={filters.query}
-                  onChange={(e) => handleSearchChange(e.target.value)}
+                  onChange={e => handleSearchChange(e.target.value)}
                   onFocus={() => setSearchFocused(true)}
                   onBlur={() => setSearchFocused(false)}
                   placeholder="Search news, topics, authors..."
@@ -125,7 +132,7 @@ export const Header: React.FC<HeaderProps> = ({
                 <Globe className="h-4 w-4" />
                 <span>Explore</span>
               </button>
-              
+
               <button
                 onClick={() => onPageChange('favorites')}
                 className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
@@ -137,6 +144,33 @@ export const Header: React.FC<HeaderProps> = ({
                 <Heart className="h-4 w-4" />
                 <span>Favorites</span>
               </button>
+
+              {user?.is_admin && (
+                <>
+                  <button
+                    onClick={() => onPageChange('admin')}
+                    className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                      currentPage === 'admin'
+                        ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'
+                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800'
+                    }`}
+                  >
+                    <Shield className="h-4 w-4" />
+                    <span>Admin Dashboard</span>
+                  </button>
+                  <button
+                    onClick={() => onPageChange('upload')}
+                    className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                      currentPage === 'upload'
+                        ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'
+                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800'
+                    }`}
+                  >
+                    <Upload className="h-4 w-4" />
+                    <span>Upload Article</span>
+                  </button>
+                </>
+              )}
             </nav>
 
             <button
@@ -166,7 +200,7 @@ export const Header: React.FC<HeaderProps> = ({
                 >
                   <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
                     <span className="text-sm font-semibold text-white">
-                      {user.name.charAt(0).toUpperCase()}
+                      {user.username.charAt(0).toUpperCase()}
                     </span>
                   </div>
                 </button>
@@ -174,7 +208,7 @@ export const Header: React.FC<HeaderProps> = ({
                 {showUserMenu && (
                   <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 py-2 z-50">
                     <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
-                      <p className="text-sm font-semibold text-gray-900 dark:text-white">{user.name}</p>
+                      <p className="text-sm font-semibold text-gray-900 dark:text-white">{user.username}</p>
                       <p className="text-xs text-gray-500 dark:text-gray-400">{user.email}</p>
                     </div>
                     <button

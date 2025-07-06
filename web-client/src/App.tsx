@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Header } from './components/Header';
 import { Sidebar } from './components/Sidebar';
 import { NewsFeed } from './components/NewsFeed';
@@ -8,29 +8,59 @@ import { FavoritesPage } from './components/FavoritesPage';
 import { SettingsPage } from './components/SettingsPage';
 import { AuthModal } from './components/AuthModal';
 import { LoadingSpinner } from './components/LoadingSpinner';
+import { AdminDashboard } from './components/AdminDashboard';
+import { NewsUploadPage } from './components/NewsUploadPage';
 import { useNews } from './hooks/useNews';
 import { useAuth } from './hooks/useAuth';
-import { NewsArticle, CurrentPage } from './types';
+import { NewsArticle, CurrentPage, User } from './types';
 
 function App() {
-  const { 
-    articles, 
-    favoriteArticles, 
+  const {
+    articles,
+    favoriteArticles,
     availableCategories,
-    filters, 
-    setFilters, 
-    preferences, 
+    filters,
+    setFilters,
+    preferences,
     setPreferences,
-    loading,
-    error,
-    refreshArticles
+    loading: newsLoading,
+    error: newsError,
+    refreshArticles,
   } = useNews();
-  
-  const { user, isAuthenticated, isLoading, login, register, logout } = useAuth();
+
+  const { user, isAuthenticated, isLoading: authLoading, login, register, logout } = useAuth();
   const [currentPage, setCurrentPage] = useState<CurrentPage>('feed');
   const [selectedArticle, setSelectedArticle] = useState<NewsArticle | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
+  const [intendedPage, setIntendedPage] = useState<CurrentPage | null>(null);
+
+  const handlePageChange = (page: CurrentPage) => {
+    if (!isAuthenticated && (page === 'favorites' || page === 'settings' || page === 'admin' || page === 'upload')) {
+      setIntendedPage(page);
+      setShowAuthModal(true);
+      return;
+    }
+    if ((page === 'admin' || page === 'upload') && !user?.is_admin) {
+      setAuthError('Access denied: Admin privileges required');
+      return;
+    }
+    setCurrentPage(page);
+    setIntendedPage(null);
+  };
+
+  useEffect(() => {
+    if (isAuthenticated && intendedPage) {
+      if ((intendedPage === 'admin' || intendedPage === 'upload') && !user?.is_admin) {
+        setAuthError('Access denied: Admin privileges required');
+        return;
+      }
+      setCurrentPage(intendedPage);
+      setShowAuthModal(false);
+      setIntendedPage(null);
+    }
+  }, [isAuthenticated, intendedPage, user]);
 
   const handleArticleClick = (article: NewsArticle) => {
     setSelectedArticle(article);
@@ -42,12 +72,24 @@ function App() {
     setSelectedArticle(null);
   };
 
-  const handlePageChange = (page: CurrentPage) => {
-    if (!isAuthenticated && (page === 'favorites' || page === 'settings')) {
-      setShowAuthModal(true);
-      return;
+  const handleLogin = async (username: string, password: string) => {
+    setAuthError(null);
+    const success = await login(username, password);
+    if (!success) {
+      setAuthError('Invalid username or password');
+      return false;
     }
-    setCurrentPage(page);
+    return true;
+  };
+
+  const handleRegister = async (username: string, email: string, password: string) => {
+    setAuthError(null);
+    const success = await register(username, email, password);
+    if (!success) {
+      setAuthError('Registration failed. Username or email may already exist.');
+      return false;
+    }
+    return true;
   };
 
   const renderCurrentPage = () => {
@@ -58,8 +100,8 @@ function App() {
             articles={articles}
             availableCategories={availableCategories}
             onArticleClick={handleArticleClick}
-            loading={loading}
-            error={error}
+            loading={newsLoading}
+            error={newsError}
             onRefresh={refreshArticles}
           />
         );
@@ -69,8 +111,8 @@ function App() {
             <NewsFeed
               articles={articles}
               onArticleClick={handleArticleClick}
-              loading={loading}
-              error={error}
+              loading={newsLoading}
+              error={newsError}
             />
           );
         }
@@ -86,8 +128,8 @@ function App() {
             <NewsFeed
               articles={articles}
               onArticleClick={handleArticleClick}
-              loading={loading}
-              error={error}
+              loading={newsLoading}
+              error={newsError}
             />
           );
         }
@@ -104,19 +146,43 @@ function App() {
             onBack={handleBackToFeed}
           />
         ) : null;
+      case 'admin':
+        if (!isAuthenticated || !user?.is_admin) {
+          return (
+            <NewsFeed
+              articles={articles}
+              onArticleClick={handleArticleClick}
+              loading={newsLoading}
+              error={newsError}
+            />
+          );
+        }
+        return <AdminDashboard user={user} onPageChange={handlePageChange} />;
+      case 'upload':
+        if (!isAuthenticated || !user?.is_admin) {
+          return (
+            <NewsFeed
+              articles={articles}
+              onArticleClick={handleArticleClick}
+              loading={newsLoading}
+              error={newsError}
+            />
+          );
+        }
+        return <NewsUploadPage user={user} />;
       default:
         return (
           <NewsFeed
             articles={articles}
             onArticleClick={handleArticleClick}
-            loading={loading}
-            error={error}
+            loading={newsLoading}
+            error={newsError}
           />
         );
     }
   };
 
-  if (isLoading) {
+  if (authLoading || newsLoading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
@@ -142,9 +208,9 @@ function App() {
         onAuthClick={() => setShowAuthModal(true)}
         onLogout={logout}
       />
-      
+
       <div className="flex">
-        {(currentPage === 'feed') && (
+        {currentPage === 'feed' && (
           <Sidebar
             isOpen={sidebarOpen}
             filters={filters}
@@ -152,22 +218,24 @@ function App() {
             onClose={() => setSidebarOpen(false)}
             availableCategories={availableCategories}
             onRefresh={refreshArticles}
-            isRefreshing={loading}
+            isRefreshing={newsLoading}
           />
         )}
-        
-        <main className={`flex-1 transition-all duration-200 ${
-          currentPage === 'feed' ? 'lg:ml-80' : ''
-        }`}>
+
+        <main className={`flex-1 transition-all duration-200 ${currentPage === 'feed' ? 'lg:ml-80' : ''}`}>
           {renderCurrentPage()}
         </main>
       </div>
 
       <AuthModal
         isOpen={showAuthModal}
-        onClose={() => setShowAuthModal(false)}
-        onLogin={login}
-        onRegister={register}
+        onClose={() => {
+          setShowAuthModal(false);
+          setAuthError(null);
+        }}
+        onLogin={handleLogin}
+        onRegister={handleRegister}
+        error={authError}
       />
     </div>
   );

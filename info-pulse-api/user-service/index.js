@@ -331,7 +331,18 @@ app.get('/api/my-topics', authenticateToken, async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
-
+app.get('/api/admin/stats', authenticateToken, requireAdmin, async (req, res) => {
+  const [articles, users, categories] = await Promise.all([
+    pool.query('SELECT COUNT(*) FROM articles'),
+    pool.query('SELECT COUNT(*) FROM users'),
+    pool.query('SELECT COUNT(*) FROM news_categories'),
+  ]);
+  res.json({
+    totalArticles: parseInt(articles.rows[0].count),
+    totalUsers: parseInt(users.rows[0].count),
+    activeCategories: parseInt(categories.rows[0].count),
+  });
+});
 // Update user's topics
 app.put('/api/my-topics', authenticateToken, async (req, res) => {
   try {
