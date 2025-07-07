@@ -39,27 +39,27 @@ services:
     networks:
       - app-network
 
-  # # Express API Server
-  # userservice:
-  #   build:
-  #     context: ./info-pulse-api/user-service
-  #     dockerfile: Dockerfile
-  #   ports:
-  #     - "3003:3003"
-  #   environment:
-  #     - PORT=3003
-  #     - JWT_SECRET=no_secret
-  #     - DB_HOST=postgres
-  #     - DB_PORT=5432
-  #     - DB_NAME=user-db
-  #     - DB_USER=pguser
-  #     - DB_PASSWORD=S3cret
-  #   depends_on:
-  #     postgres:
-  #       condition: service_healthy
-  #   restart: unless-stopped
-  #   networks:
-  #     - app-network
+  # Express API Server
+  userservice:
+    build:
+      context: ./info-pulse-api/user-service
+      dockerfile: Dockerfile
+    ports:
+      - "3003:3003"
+    environment:
+      - PORT=3003
+      - JWT_SECRET=no_secret
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=user-db
+      - DB_USER=pguser
+      - DB_PASSWORD=S3cret
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - app-network
 
   user-service-test:
     build:

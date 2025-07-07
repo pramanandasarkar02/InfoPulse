@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Search, Menu, Heart, Settings, Home, Moon, Sun, LogOut, Globe, Sparkles, Shield, Upload } from 'lucide-react';
 import { SearchFilters, User, CurrentPage } from '../types';
@@ -14,40 +13,28 @@ interface HeaderProps {
   onLogout: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({
-  filters,
-  onFiltersChange,
-  currentPage,
-  onPageChange,
-  onToggleSidebar,
-  user,
-  onAuthClick,
-  onLogout,
-}) => {
+export const Header = React.memo(({ filters, onFiltersChange, currentPage, onPageChange, onToggleSidebar, user, onAuthClick, onLogout }: HeaderProps) => {
   const [darkMode, setDarkMode] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return (
-        localStorage.getItem('theme') === 'dark' ||
-        (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)
-      );
-    }
-    return false;
+    if (typeof window === 'undefined') return false;
+    const savedTheme = localStorage.getItem('theme');
+    return savedTheme ? savedTheme === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
   });
   const [searchFocused, setSearchFocused] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
 
   useEffect(() => {
+    const root = document.documentElement;
     if (darkMode) {
-      document.documentElement.classList.add('dark');
+      root.classList.add('dark');
       localStorage.setItem('theme', 'dark');
     } else {
-      document.documentElement.classList.remove('dark');
+      root.classList.remove('dark');
       localStorage.setItem('theme', 'light');
     }
   }, [darkMode]);
 
   const toggleDarkMode = () => {
-    setDarkMode(!darkMode);
+    setDarkMode(prev => !prev);
   };
 
   const handleSearchChange = (query: string) => {
@@ -58,7 +45,6 @@ export const Header: React.FC<HeaderProps> = ({
     <header className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm shadow-sm border-b border-gray-100 dark:border-gray-800 sticky top-0 z-50 transition-all duration-200">
       <div className="max-w-full px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Logo and Menu */}
           <div className="flex items-center space-x-4">
             <button
               onClick={onToggleSidebar}
@@ -66,7 +52,6 @@ export const Header: React.FC<HeaderProps> = ({
             >
               <Menu className="h-6 w-6" />
             </button>
-
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-sm">
                 <Sparkles className="h-6 w-6 text-white" />
@@ -81,17 +66,11 @@ export const Header: React.FC<HeaderProps> = ({
               </div>
             </div>
           </div>
-
-          {/* Search Bar - Only show on feed and explore pages */}
           {(currentPage === 'feed' || currentPage === 'explore') && (
             <div className="flex-1 max-w-2xl mx-6">
               <div className={`relative transition-all duration-300 ${searchFocused ? 'scale-[1.02]' : ''}`}>
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <Search
-                    className={`h-5 w-5 transition-colors duration-200 ${
-                      searchFocused ? 'text-blue-500' : 'text-gray-400'
-                    }`}
-                  />
+                  <Search className={`h-5 w-5 transition-colors duration-200 ${searchFocused ? 'text-blue-500' : 'text-gray-400'}`} />
                 </div>
                 <input
                   type="text"
@@ -105,54 +84,41 @@ export const Header: React.FC<HeaderProps> = ({
               </div>
             </div>
           )}
-
-          {/* Navigation and Actions */}
           <div className="flex items-center space-x-2">
             <nav className="hidden sm:flex items-center space-x-1">
               <button
                 onClick={() => onPageChange('feed')}
                 className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                  currentPage === 'feed'
-                    ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'
-                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800'
+                  currentPage === 'feed' ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800'
                 }`}
               >
                 <Home className="h-4 w-4" />
                 <span>Feed</span>
               </button>
-
               <button
                 onClick={() => onPageChange('explore')}
                 className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                  currentPage === 'explore'
-                    ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'
-                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800'
+                  currentPage === 'explore' ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800'
                 }`}
               >
                 <Globe className="h-4 w-4" />
                 <span>Explore</span>
               </button>
-
               <button
                 onClick={() => onPageChange('favorites')}
                 className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                  currentPage === 'favorites'
-                    ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'
-                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800'
+                  currentPage === 'favorites' ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800'
                 }`}
               >
                 <Heart className="h-4 w-4" />
                 <span>Favorites</span>
               </button>
-
               {user?.is_admin && (
                 <>
                   <button
                     onClick={() => onPageChange('admin')}
                     className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                      currentPage === 'admin'
-                        ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'
-                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800'
+                      currentPage === 'admin' ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800'
                     }`}
                   >
                     <Shield className="h-4 w-4" />
@@ -161,9 +127,7 @@ export const Header: React.FC<HeaderProps> = ({
                   <button
                     onClick={() => onPageChange('upload')}
                     className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                      currentPage === 'upload'
-                        ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'
-                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800'
+                      currentPage === 'upload' ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800'
                     }`}
                   >
                     <Upload className="h-4 w-4" />
@@ -172,26 +136,21 @@ export const Header: React.FC<HeaderProps> = ({
                 </>
               )}
             </nav>
-
             <button
               onClick={toggleDarkMode}
               className="p-2 rounded-lg text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200"
+              aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
             >
               {darkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
             </button>
-
             <button
               onClick={() => onPageChange('settings')}
               className={`p-2 rounded-lg transition-all duration-200 ${
-                currentPage === 'settings'
-                  ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'
-                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800'
+                currentPage === 'settings' ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800'
               }`}
             >
               <Settings className="h-5 w-5" />
             </button>
-
-            {/* User Menu */}
             {user ? (
               <div className="relative">
                 <button
@@ -199,12 +158,9 @@ export const Header: React.FC<HeaderProps> = ({
                   className="flex items-center space-x-2 p-2 rounded-lg text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200"
                 >
                   <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                    <span className="text-sm font-semibold text-white">
-                      {user.username.charAt(0).toUpperCase()}
-                    </span>
+                    <span className="text-sm font-semibold text-white">{user.username.charAt(0).toUpperCase()}</span>
                   </div>
                 </button>
-
                 {showUserMenu && (
                   <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 py-2 z-50">
                     <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
@@ -237,4 +193,4 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
     </header>
   );
-};
+});
