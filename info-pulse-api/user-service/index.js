@@ -469,6 +469,13 @@ async function startServer() {
   }
 }
 
-startServer();
+// Start server only if not in test environment
+if (process.env.NODE_ENV !== 'test') {
+  startServer();
+}
 
 module.exports = app;
+
+// startServer();
+
+// module.exports = app;

@@ -61,6 +61,16 @@ services:
   #   networks:
   #     - app-network
 
+  user-service-test:
+    build:
+      context: ./info-pulse-api/user-service
+      dockerfile: Dockerfile.test
+    environment:
+      - NODE_ENV=test
+      - JWT_SECRET=no_secret
+    networks:
+      - app-network
+
   # usersearching:
   #   build:
   #     context: ./info-pulse-api/user-searching-service
