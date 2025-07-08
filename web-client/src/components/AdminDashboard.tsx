@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Loader2, Newspaper, Users, Upload } from 'lucide-react';
 import axios from 'axios';
@@ -26,7 +25,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onPageChan
     const fetchStats = async () => {
       try {
         const token = localStorage.getItem('infopulse_token');
-        const response = await axios.get('/api/admin/stats', {
+        const response = await axios.get('http://localhost:3003/api/admin/stats', {
           headers: { Authorization: `Bearer ${token}` },
         });
         setStats(response.data);
@@ -71,7 +70,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onPageChan
             </div>
           </div>
         </div>
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+        <button
+          onClick={() => onPageChange('users')}
+          className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+        >
           <div className="flex items-center space-x-3">
             <Users className="h-8 w-8 text-green-500" />
             <div>
@@ -81,8 +83,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onPageChan
               </p>
             </div>
           </div>
-        </div>
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+        </button>
+        <button
+          onClick={() => onPageChange('categories')}
+          className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+        >
           <div className="flex items-center space-x-3">
             <Newspaper className="h-8 w-8 text-purple-500" />
             <div>
@@ -92,7 +97,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onPageChan
               </p>
             </div>
           </div>
-        </div>
+        </button>
       </div>
       <div className="mt-8">
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Quick Actions</h2>

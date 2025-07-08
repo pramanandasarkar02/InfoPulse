@@ -48,6 +48,6 @@ jobs:
             git clone https://github.com/pramanandasarkar02/InfoPulse.git
             # Run Docker Compose in detached mode
             cd InfoPulse
-            docker compose up -d
+            docker compose up -d --build
           EOF
       

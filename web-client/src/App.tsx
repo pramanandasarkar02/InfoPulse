@@ -10,6 +10,8 @@ import { AuthModal } from './components/AuthModal';
 import { LoadingSpinner } from './components/LoadingSpinner';
 import { AdminDashboard } from './components/AdminDashboard';
 import { NewsUploadPage } from './components/NewsUploadPage';
+import { UsersManagement } from './components/UsersManagement'; // New import
+import { CategoriesManagement } from './components/CategoriesManagement'; // New import
 import { useNews } from './hooks/useNews';
 import { useAuth } from './hooks/useAuth';
 import { NewsArticle, CurrentPage, User } from './types';
@@ -37,12 +39,12 @@ function App() {
   const [intendedPage, setIntendedPage] = useState<CurrentPage | null>(null);
 
   const handlePageChange = (page: CurrentPage) => {
-    if (!isAuthenticated && (page === 'favorites' || page === 'settings' || page === 'admin' || page === 'upload')) {
+    if (!isAuthenticated && (page === 'favorites' || page === 'settings' || page === 'admin' || page === 'upload' || page === 'users' || page === 'categories')) {
       setIntendedPage(page);
       setShowAuthModal(true);
       return;
     }
-    if ((page === 'admin' || page === 'upload') && !user?.is_admin) {
+    if ((page === 'admin' || page === 'upload' || page === 'users' || page === 'categories') && !user?.is_admin) {
       setAuthError('Access denied: Admin privileges required');
       return;
     }
@@ -52,7 +54,7 @@ function App() {
 
   useEffect(() => {
     if (isAuthenticated && intendedPage) {
-      if ((intendedPage === 'admin' || intendedPage === 'upload') && !user?.is_admin) {
+      if ((intendedPage === 'admin' || intendedPage === 'upload' || intendedPage === 'users' || intendedPage === 'categories') && !user?.is_admin) {
         setAuthError('Access denied: Admin privileges required');
         return;
       }
@@ -170,6 +172,30 @@ function App() {
           );
         }
         return <NewsUploadPage user={user} />;
+      case 'users':
+        if (!isAuthenticated || !user?.is_admin) {
+          return (
+            <NewsFeed
+              articles={articles}
+              onArticleClick={handleArticleClick}
+              loading={newsLoading}
+              error={newsError}
+            />
+          );
+        }
+        return <UsersManagement user={user} />;
+      case 'categories':
+        if (!isAuthenticated || !user?.is_admin) {
+          return (
+            <NewsFeed
+              articles={articles}
+              onArticleClick={handleArticleClick}
+              loading={newsLoading}
+              error={newsError}
+            />
+          );
+        }
+        return <CategoriesManagement user={user} />;
       default:
         return (
           <NewsFeed

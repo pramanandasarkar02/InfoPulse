@@ -42,4 +42,5 @@ export interface AuthState {
   isLoading: boolean;
 }
 
-export type CurrentPage = 'feed' | 'explore' | 'favorites' | 'settings' | 'article' | 'admin' | 'upload';
+export type CurrentPage = 'feed' | 'explore' | 'favorites' | 'settings' | 'article' | 'admin' | 'upload' | 'users' | 'categories';
+

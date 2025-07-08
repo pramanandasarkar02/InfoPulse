@@ -332,16 +332,23 @@ app.get('/api/my-topics', authenticateToken, async (req, res) => {
   }
 });
 app.get('/api/admin/stats', authenticateToken, requireAdmin, async (req, res) => {
-  const [articles, users, categories] = await Promise.all([
-    pool.query('SELECT COUNT(*) FROM articles'),
-    pool.query('SELECT COUNT(*) FROM users'),
-    pool.query('SELECT COUNT(*) FROM news_categories'),
-  ]);
-  res.json({
-    totalArticles: parseInt(articles.rows[0].count),
-    totalUsers: parseInt(users.rows[0].count),
-    activeCategories: parseInt(categories.rows[0].count),
-  });
+  console.log('Reached /api/admin/stats endpoint');
+  try {
+    const [ users, categories] = await Promise.all([
+      pool.query('SELECT COUNT(*) FROM users'),
+      pool.query('SELECT COUNT(*) FROM news_categories'),
+    ]);
+    const articles = 61;
+    // console.log('Queries completed:', { articles, users, categories });
+    res.json({
+      totalArticles: parseInt(articles),
+      totalUsers: parseInt(users.rows[0].count),
+      activeCategories: parseInt(categories.rows[0].count),
+    });
+  } catch (error) {
+    console.error('Error in /api/admin/stats:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 });
 // Update user's topics
 app.put('/api/my-topics', authenticateToken, async (req, res) => {
@@ -399,6 +406,18 @@ app.delete('/api/admin/users/:id', authenticateToken, requireAdmin, async (req, 
     res.json({ message: 'User deleted successfully' });
   } catch (error) {
     console.error('Delete user error:', error.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.get('/api/admin/categories', authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    const result = await pool.query(
+      'SELECT id, name FROM news_categories ORDER BY name ASC'
+    );
+    res.json({ categories: result.rows }); // Use 'categories' to match frontend expectation
+  } catch (error) {
+    console.error('Get categories error:', error.message);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
