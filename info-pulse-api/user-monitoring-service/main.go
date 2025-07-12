@@ -1,4 +1,4 @@
-package usermonitoringservice
+package main
 
 import (
 	"github.com/gin-gonic/gin"

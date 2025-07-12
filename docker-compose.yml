@@ -1,4 +1,3 @@
-version: '3.8'
 services:
   newsfetching:
     build:
@@ -39,86 +38,86 @@ services:
     networks:
       - app-network
 
-  # Express API Server
-  userservice:
-    build:
-      context: ./info-pulse-api/user-service
-      dockerfile: Dockerfile
-    ports:
-      - "3003:3003"
-    environment:
-      - PORT=3003
-      - JWT_SECRET=no_secret
-      - DB_HOST=postgres
-      - DB_PORT=5432
-      - DB_NAME=user-db
-      - DB_USER=pguser
-      - DB_PASSWORD=S3cret
-    depends_on:
-      postgres:
-        condition: service_healthy
-    restart: unless-stopped
-    networks:
-      - app-network
-
-  # user-service-test:
+  # # Express API Server
+  # userservice:
   #   build:
   #     context: ./info-pulse-api/user-service
-  #     dockerfile: Dockerfile.test
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "3003:3003"
   #   environment:
-  #     - NODE_ENV=test
+  #     - PORT=3003
   #     - JWT_SECRET=no_secret
+  #     - DB_HOST=postgres
+  #     - DB_PORT=5432
+  #     - DB_NAME=user-db
+  #     - DB_USER=pguser
+  #     - DB_PASSWORD=S3cret
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #   restart: unless-stopped
   #   networks:
   #     - app-network
 
-  usersearching:
-    build:
-      context: ./info-pulse-api/user-searching-service
-      dockerfile: Dockerfile
-    ports:
-      - "3004:3004" 
-    environment:
-      - PYTHONUNBUFFERED=1
-    restart: unless-stopped
+  # # user-service-test:
+  # #   build:
+  # #     context: ./info-pulse-api/user-service
+  # #     dockerfile: Dockerfile.test
+  # #   environment:
+  # #     - NODE_ENV=test
+  # #     - JWT_SECRET=no_secret
+  # #   networks:
+  # #     - app-network
 
-  newsrecommendation:
-    build:
-      context: ./info-pulse-api/user-recommendation-service
-      dockerfile: Dockerfile
-    ports:
-      - "3005:3005" # Match internal port with Dockerfile CMD
-    environment:
-      - PYTHONUNBUFFERED=1
-    restart: unless-stopped
-
-  usermonitoring:
-    build:
-      context: ./info-pulse-api/user-monitoring-service
-      dockerfile: Dockerfile
-    ports:
-      - "3006:3006"
-    
-    restart: unless-stopped
-
-  # apigateway:
+  # usersearching:
   #   build:
-  #     context: ./info-pulse-api/api-gateway
+  #     context: ./info-pulse-api/user-searching-service
   #     dockerfile: Dockerfile
   #   ports:
-  #     - "3000:3000"
+  #     - "3004:3004" 
+  #   environment:
+  #     - PYTHONUNBUFFERED=1
+  #   restart: unless-stopped
+
+  # newsrecommendation:
+  #   build:
+  #     context: ./info-pulse-api/user-recommendation-service
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "3005:3005" # Match internal port with Dockerfile CMD
+  #   environment:
+  #     - PYTHONUNBUFFERED=1
+  #   restart: unless-stopped
+
+  # usermonitoring:
+  #   build:
+  #     context: ./info-pulse-api/user-monitoring-service
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "3006:3006"
+    
+  #   restart: unless-stopped
+
+  # # apigateway:
+  # #   build:
+  # #     context: ./info-pulse-api/api-gateway
+  # #     dockerfile: Dockerfile
+  # #   ports:
+  # #     - "3000:3000"
+  # #   environment:
+  # #     - NODE_ENV=production
+  # #   restart: unless-stopped
+
+  # frontend:
+  #   build:
+  #     context: ./web-client
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "5173:5173"
   #   environment:
   #     - NODE_ENV=production
   #   restart: unless-stopped
-
-  frontend:
-    build:
-      context: ./web-client
-      dockerfile: Dockerfile
-    ports:
-      - "5173:5173"
-    environment:
-      - NODE_ENV=production
-    restart: unless-stopped
 
   
 volumes:

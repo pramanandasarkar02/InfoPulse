@@ -10,13 +10,13 @@ import { AuthModal } from './components/AuthModal';
 import { LoadingSpinner } from './components/LoadingSpinner';
 import { AdminDashboard } from './components/AdminDashboard';
 import { NewsUploadPage } from './components/NewsUploadPage';
-import { UsersManagement } from './components/UsersManagement'; // New import
-import { CategoriesManagement } from './components/CategoriesManagement'; // New import
+import { UsersManagement } from './components/UsersManagement';
+import { CategoriesManagement } from './components/CategoriesManagement';
 import { useNews } from './hooks/useNews';
 import { useAuth } from './hooks/useAuth';
-import { NewsArticle, CurrentPage, User } from './types';
+import { NewsArticle, CurrentPage, SearchFilters, User } from './types';
 
-function App() {
+const App: React.FC = () => {
   const {
     articles,
     favoriteArticles,
@@ -37,6 +37,10 @@ function App() {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
   const [intendedPage, setIntendedPage] = useState<CurrentPage | null>(null);
+
+  useEffect(() => {
+    console.log('Auth state:', { user, isAuthenticated, isLoading: authLoading });
+  }, [user, isAuthenticated, authLoading]);
 
   const handlePageChange = (page: CurrentPage) => {
     if (!isAuthenticated && (page === 'favorites' || page === 'settings' || page === 'admin' || page === 'upload' || page === 'users' || page === 'categories')) {
@@ -208,7 +212,7 @@ function App() {
     }
   };
 
-  if (authLoading || newsLoading) {
+  if (authLoading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
@@ -265,6 +269,6 @@ function App() {
       />
     </div>
   );
-}
+};
 
 export default App;

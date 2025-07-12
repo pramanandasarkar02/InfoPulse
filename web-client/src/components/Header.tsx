@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Menu, Heart, Settings, Home, Moon, Sun, LogOut, Globe, Sparkles, Shield, Upload } from 'lucide-react';
-import { SearchFilters, User, CurrentPage } from '../types';
+import { SearchFilters, CurrentPage, User } from '../types';
 
 interface HeaderProps {
   filters: SearchFilters;

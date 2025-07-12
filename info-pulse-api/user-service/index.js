@@ -6,11 +6,15 @@ const cors = require('cors');
 require('dotenv').config();
 
 const app = express();
-const PORT = process.env.PORT || 3003; // Match Docker Compose PORT
+const PORT = process.env.PORT || 3003;
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
+const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET || 'your-refresh-secret-key';
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  // origin: 'http://localhost:3000', // Allow frontend origin
+  credentials: true,
+}));
 app.use(express.json());
 
 // PostgreSQL connection
@@ -68,7 +72,20 @@ async function initializeDatabase() {
       )
     `);
 
-    // Create user_topics table (many-to-many relationship)
+    // Create news_articles table
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS news_articles (
+        id SERIAL PRIMARY KEY,
+        title VARCHAR(255) NOT NULL,
+        content TEXT NOT NULL,
+        category_id INTEGER REFERENCES news_categories(id) ON DELETE SET NULL,
+        author_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+        published_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        image_url VARCHAR(255)
+      )
+    `);
+
+    // Create user_topics table
     await pool.query(`
       CREATE TABLE IF NOT EXISTS user_topics (
         id SERIAL PRIMARY KEY,
@@ -79,7 +96,17 @@ async function initializeDatabase() {
       )
     `);
 
-    // Insert default categories if not exists
+    // Create refresh_tokens table
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS refresh_tokens (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+        token VARCHAR(255) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    // Insert default categories
     console.log('Inserting default categories...');
     for (const category of DEFAULT_CATEGORIES) {
       await pool.query(
@@ -88,22 +115,17 @@ async function initializeDatabase() {
       );
     }
 
-    // Insert default users if not exists
+    // Insert default users
     console.log('Creating default users...');
     for (const user of DEFAULT_USERS) {
       try {
-        // Check if user already exists
         const existingUser = await pool.query(
           'SELECT id FROM users WHERE username = $1 OR email = $2',
           [user.username, user.email]
         );
 
         if (existingUser.rows.length === 0) {
-          // Hash password
           const hashedPassword = await bcrypt.hash(user.password, 10);
-
-
-          // Create user
           const result = await pool.query(
             'INSERT INTO users (username, email, password, is_admin) VALUES ($1, $2, $3, $4) RETURNING id',
             [user.username, user.email, hashedPassword, user.is_admin]
@@ -111,12 +133,10 @@ async function initializeDatabase() {
 
           const newUserId = result.rows[0].id;
 
-          // Assign default topics (first 5 categories) to non-admin users
           if (!user.is_admin) {
             const defaultCategories = await pool.query(
               'SELECT id FROM news_categories ORDER BY id LIMIT 5'
             );
-
             for (const category of defaultCategories.rows) {
               await pool.query(
                 'INSERT INTO user_topics (user_id, category_id) VALUES ($1, $2) ON CONFLICT DO NOTHING',
@@ -137,12 +157,12 @@ async function initializeDatabase() {
     console.log('Database initialized successfully');
   } catch (error) {
     console.error('Database initialization error:', error.message);
-    throw error; // Rethrow to handle in server startup
+    throw error;
   }
 }
 
 // Authentication middleware
-const authenticateToken = (req, res, next) => {
+const authenticateToken = async (req, res, next) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
 
@@ -150,13 +170,13 @@ const authenticateToken = (req, res, next) => {
     return res.status(401).json({ error: 'Access token required' });
   }
 
-  jwt.verify(token, JWT_SECRET, (err, user) => {
-    if (err) {
-      return res.status(403).json({ error: 'Invalid token' });
-    }
-    req.user = user;
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    req.user = decoded;
     next();
-  });
+  } catch (err) {
+    return res.status(403).json({ error: 'Invalid or expired token' });
+  }
 };
 
 // Admin middleware
@@ -169,7 +189,7 @@ const requireAdmin = (req, res, next) => {
 
 // Routes
 
-// User_registration
+// Register
 app.post('/api/register', async (req, res) => {
   try {
     const { username, email, password, is_admin = false } = req.body;
@@ -178,7 +198,6 @@ app.post('/api/register', async (req, res) => {
       return res.status(400).json({ error: 'Username, email, and password are required' });
     }
 
-    // Check if user already exists
     const existingUser = await pool.query(
       'SELECT id FROM users WHERE username = $1 OR email = $2',
       [username, email]
@@ -188,28 +207,40 @@ app.post('/api/register', async (req, res) => {
       return res.status(409).json({ error: 'Username or email already exists' });
     }
 
-    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Create user
     const result = await pool.query(
-      'INSERT INTO users (username, email, password, is_admin) VALUES ($1, $2, $3, $4) RETURNING id, username, email, is_admin',
+      'INSERT INTO users (username, email, password, is_admin) VALUES ($1, $2, $3, $4) RETURNING id, username, email, is_admin, created_at',
       [username, email, hashedPassword, is_admin]
     );
 
     const newUser = result.rows[0];
 
-    // Assign default topics (first 5 categories)
     const defaultCategories = await pool.query(
       'SELECT id FROM news_categories ORDER BY id LIMIT 5'
     );
-
     for (const category of defaultCategories.rows) {
       await pool.query(
         'INSERT INTO user_topics (user_id, category_id) VALUES ($1, $2) ON CONFLICT DO NOTHING',
         [newUser.id, category.id]
       );
     }
+
+    const token = jwt.sign(
+      { id: newUser.id, username: newUser.username, is_admin: newUser.is_admin },
+      JWT_SECRET,
+      { expiresIn: '24h' }
+    );
+
+    const refreshToken = jwt.sign(
+      { id: newUser.id },
+      REFRESH_TOKEN_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    await pool.query(
+      'INSERT INTO refresh_tokens (user_id, token) VALUES ($1, $2)',
+      [newUser.id, refreshToken]
+    );
 
     res.status(201).json({
       message: 'User created successfully',
@@ -218,7 +249,10 @@ app.post('/api/register', async (req, res) => {
         username: newUser.username,
         email: newUser.email,
         is_admin: newUser.is_admin,
+        created_at: newUser.created_at,
       },
+      token,
+      refreshToken,
     });
   } catch (error) {
     console.error('Registration error:', error.message);
@@ -226,7 +260,7 @@ app.post('/api/register', async (req, res) => {
   }
 });
 
-// User Login
+// Login
 app.post('/api/login', async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -235,9 +269,8 @@ app.post('/api/login', async (req, res) => {
       return res.status(400).json({ error: 'Username and password are required' });
     }
 
-    // Find user
     const result = await pool.query(
-      'SELECT id, username, email, password, is_admin FROM users WHERE username = $1',
+      'SELECT id, username, email, password, is_admin, created_at FROM users WHERE username = $1',
       [username]
     );
 
@@ -246,33 +279,39 @@ app.post('/api/login', async (req, res) => {
     }
 
     const user = result.rows[0];
-
-    // Verify password
     const isValidPassword = await bcrypt.compare(password, user.password);
 
     if (!isValidPassword) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    // Generate JWT token
     const token = jwt.sign(
-      {
-        id: user.id,
-        username: user.username,
-        is_admin: user.is_admin,
-      },
+      { id: user.id, username: user.username, is_admin: user.is_admin },
       JWT_SECRET,
       { expiresIn: '24h' }
+    );
+
+    const refreshToken = jwt.sign(
+      { id: user.id },
+      REFRESH_TOKEN_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    await pool.query(
+      'INSERT INTO refresh_tokens (user_id, token) VALUES ($1, $2)',
+      [user.id, refreshToken]
     );
 
     res.json({
       message: 'Login successful',
       token,
+      refreshToken,
       user: {
         id: user.id,
         username: user.username,
         email: user.email,
         is_admin: user.is_admin,
+        created_at: user.created_at,
       },
     });
   } catch (error) {
@@ -281,7 +320,59 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
-// Get user profile
+// Refresh token
+app.post('/api/refresh-token', async (req, res) => {
+  const { refreshToken } = req.body;
+
+  if (!refreshToken) {
+    return res.status(401).json({ error: 'Refresh token required' });
+  }
+
+  try {
+    const decoded = jwt.verify(refreshToken, REFRESH_TOKEN_SECRET);
+    const result = await pool.query(
+      'SELECT * FROM refresh_tokens WHERE token = $1 AND user_id = $2',
+      [refreshToken, decoded.id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(403).json({ error: 'Invalid refresh token' });
+    }
+
+    const userResult = await pool.query(
+      'SELECT id, username, email, is_admin, created_at FROM users WHERE id = $1',
+      [decoded.id]
+    );
+
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const user = userResult.rows[0];
+    const newToken = jwt.sign(
+      { id: user.id, username: user.username, is_admin: user.is_admin },
+      JWT_SECRET,
+      { expiresIn: '24h' }
+    );
+
+    res.json({
+      message: 'Token refreshed successfully',
+      token: newToken,
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        is_admin: user.is_admin,
+        created_at: user.created_at,
+      },
+    });
+  } catch (error) {
+    console.error('Refresh token error:', error.message);
+    res.status(403).json({ error: 'Invalid or expired refresh token' });
+  }
+});
+
+// Profile
 app.get('/api/profile', authenticateToken, async (req, res) => {
   try {
     const result = await pool.query(
@@ -300,7 +391,7 @@ app.get('/api/profile', authenticateToken, async (req, res) => {
   }
 });
 
-// Get all news categories
+// Categories
 app.get('/api/categories', authenticateToken, async (req, res) => {
   try {
     const result = await pool.query('SELECT id, name FROM news_categories ORDER BY name');
@@ -311,7 +402,7 @@ app.get('/api/categories', authenticateToken, async (req, res) => {
   }
 });
 
-// Get user's selected topics
+// User topics
 app.get('/api/my-topics', authenticateToken, async (req, res) => {
   try {
     const result = await pool.query(
@@ -331,26 +422,8 @@ app.get('/api/my-topics', authenticateToken, async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
-app.get('/api/admin/stats', authenticateToken, requireAdmin, async (req, res) => {
-  console.log('Reached /api/admin/stats endpoint');
-  try {
-    const [ users, categories] = await Promise.all([
-      pool.query('SELECT COUNT(*) FROM users'),
-      pool.query('SELECT COUNT(*) FROM news_categories'),
-    ]);
-    const articles = 61;
-    // console.log('Queries completed:', { articles, users, categories });
-    res.json({
-      totalArticles: parseInt(articles),
-      totalUsers: parseInt(users.rows[0].count),
-      activeCategories: parseInt(categories.rows[0].count),
-    });
-  } catch (error) {
-    console.error('Error in /api/admin/stats:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-// Update user's topics
+
+// Update user topics
 app.put('/api/my-topics', authenticateToken, async (req, res) => {
   try {
     const { category_ids } = req.body;
@@ -359,10 +432,8 @@ app.put('/api/my-topics', authenticateToken, async (req, res) => {
       return res.status(400).json({ error: 'category_ids must be an array' });
     }
 
-    // Remove existing topics
-    await pool.query('DELETE FROM user sexuales WHERE user_id = $1', [req.user.id]);
+    await pool.query('DELETE FROM user_topics WHERE user_id = $1', [req.user.id]);
 
-    // Add new topics
     for (const categoryId of category_ids) {
       await pool.query(
         'INSERT INTO user_topics (user_id, category_id) VALUES ($1, $2) ON CONFLICT DO NOTHING',
@@ -377,9 +448,26 @@ app.put('/api/my-topics', authenticateToken, async (req, res) => {
   }
 });
 
-// Admin Routes
+// Admin routes
+app.get('/api/admin/stats', authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    const [users, categories, articles] = await Promise.all([
+      pool.query('SELECT COUNT(*) FROM users'),
+      pool.query('SELECT COUNT(*) FROM news_categories'),
+      pool.query('SELECT COUNT(*) FROM news_articles'),
+    ]);
 
-// Get all users (admin only)
+    res.json({
+      totalArticles: parseInt(articles.rows[0].count),
+      totalUsers: parseInt(users.rows[0].count),
+      activeCategories: parseInt(categories.rows[0].count),
+    });
+  } catch (error) {
+    console.error('Admin stats error:', error.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 app.get('/api/admin/users', authenticateToken, requireAdmin, async (req, res) => {
   try {
     const result = await pool.query(
@@ -392,11 +480,9 @@ app.get('/api/admin/users', authenticateToken, requireAdmin, async (req, res) =>
   }
 });
 
-// Delete user (admin only)
 app.delete('/api/admin/users/:id', authenticateToken, requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
-
     const result = await pool.query('DELETE FROM users WHERE id = $1 RETURNING id', [id]);
 
     if (result.rows.length === 0) {
@@ -415,14 +501,13 @@ app.get('/api/admin/categories', authenticateToken, requireAdmin, async (req, re
     const result = await pool.query(
       'SELECT id, name FROM news_categories ORDER BY name ASC'
     );
-    res.json({ categories: result.rows }); // Use 'categories' to match frontend expectation
+    res.json({ categories: result.rows });
   } catch (error) {
     console.error('Get categories error:', error.message);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-// Add new category (admin only)
 app.post('/api/admin/categories', authenticateToken, requireAdmin, async (req, res) => {
   try {
     const { name } = req.body;
@@ -442,7 +527,6 @@ app.post('/api/admin/categories', authenticateToken, requireAdmin, async (req, r
     });
   } catch (error) {
     if (error.code === '23505') {
-      // Unique constraint violation
       return res.status(409).json({ error: 'Category already exists' });
     }
     console.error('Add category error:', error.message);
@@ -450,14 +534,10 @@ app.post('/api/admin/categories', authenticateToken, requireAdmin, async (req, r
   }
 });
 
-// Delete category (admin only)
 app.delete('/api/admin/categories/:id', authenticateToken, requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
-
-    const result = await pool.query('DELETE FROM news_categories WHERE id = $1 RETURNING id', [
-      id,
-    ]);
+    const result = await pool.query('DELETE FROM news_categories WHERE id = $1 RETURNING id', [id]);
 
     if (result.rows.length === 0) {
       return res.status(404).json({ error: 'Category not found' });
@@ -484,17 +564,12 @@ async function startServer() {
     });
   } catch (error) {
     console.error('Failed to start server:', error.message);
-    process.exit(1); // Exit on failure to prevent restarts
+    process.exit(1);
   }
 }
 
-// Start server only if not in test environment
 if (process.env.NODE_ENV !== 'test') {
   startServer();
 }
 
 module.exports = app;
-
-// startServer();
-
-// module.exports = app;
