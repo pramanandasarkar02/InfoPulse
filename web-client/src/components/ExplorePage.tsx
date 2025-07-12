@@ -2,7 +2,8 @@ import React, { useState, useMemo } from 'react';
 import { Search, TrendingUp, Globe, Filter, AlertCircle, RefreshCw } from 'lucide-react';
 import { NewsCard } from './NewsCard';
 import { LoadingSpinner } from './LoadingSpinner';
-import { NewsArticle, SearchFilters } from '../types';
+import { NewsArticle } from '../types';
+import { useAuth } from '../hooks/useAuth';
 
 interface ExplorePageProps {
   articles: NewsArticle[];
@@ -13,14 +14,15 @@ interface ExplorePageProps {
   onRefresh?: () => void;
 }
 
-export const ExplorePage: React.FC<ExplorePageProps> = ({ 
-  articles, 
-  onArticleClick, 
+export const ExplorePage: React.FC<ExplorePageProps> = ({
+  articles,
+  onArticleClick,
   availableCategories,
   loading = false,
   error = null,
-  onRefresh
+  onRefresh,
 }) => {
+  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [sortBy, setSortBy] = useState<'newest' | 'trending' | 'popular'>('newest');
@@ -30,39 +32,34 @@ export const ExplorePage: React.FC<ExplorePageProps> = ({
   const filteredArticles = useMemo(() => {
     let filtered = [...articles];
 
-    // Apply search query
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(
-        article =>
+        (article) =>
           article.title.toLowerCase().includes(query) ||
           article.summary.toLowerCase().includes(query) ||
           article.content.toLowerCase().includes(query) ||
-          article.tags.some(tag => tag.toLowerCase().includes(query)) ||
+          article.tags.some((tag) => tag.toLowerCase().includes(query)) ||
           article.author.toLowerCase().includes(query) ||
           article.category.toLowerCase().includes(query) ||
           article.source.toLowerCase().includes(query)
       );
     }
 
-    // Apply category filter
     if (selectedCategory && selectedCategory !== '') {
-      filtered = filtered.filter(article => article.category === selectedCategory);
+      filtered = filtered.filter((article) => article.category === selectedCategory);
     }
 
-    // Apply sorting
     filtered.sort((a, b) => {
       switch (sortBy) {
         case 'newest':
           return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime();
         case 'trending':
-          // Mock trending based on read time and recency
-          const aTrending = (10 - a.readTime) + (new Date(a.publishedAt).getTime() / 1000000000);
-          const bTrending = (10 - b.readTime) + (new Date(b.publishedAt).getTime() / 1000000000);
+          const aTrending = (10 - a.readTime) + new Date(a.publishedAt).getTime() / 1000000000;
+          const bTrending = (10 - b.readTime) + new Date(b.publishedAt).getTime() / 1000000000;
           return bTrending - aTrending;
         case 'popular':
-          // Mock popularity based on tags count and read time
-          return (b.tags.length * b.readTime) - (a.tags.length * a.readTime);
+          return b.tags.length * b.readTime - a.tags.length * a.readTime;
         default:
           return 0;
       }
@@ -73,36 +70,37 @@ export const ExplorePage: React.FC<ExplorePageProps> = ({
 
   const handleLoadMore = async () => {
     setLoadingMore(true);
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    setDisplayedArticles(prev => prev + 12);
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    setDisplayedArticles((prev) => prev + 12);
     setLoadingMore(false);
   };
 
   const visibleArticles = filteredArticles.slice(0, displayedArticles);
   const hasMore = displayedArticles < filteredArticles.length;
 
-  // Get trending topics from article tags
   const trendingTopics = useMemo(() => {
     const tagCounts: { [key: string]: number } = {};
-    articles.forEach(article => {
-      article.tags.forEach(tag => {
+    articles.forEach((article) => {
+      article.tags.forEach((tag) => {
         tagCounts[tag] = (tagCounts[tag] || 0) + 1;
       });
     });
-    
+
     return Object.entries(tagCounts)
       .sort(([, a], [, b]) => b - a)
       .slice(0, 8)
       .map(([tag]) => tag);
   }, [articles]);
 
-  if (loading) {
+  if (authLoading || loading) {
     return (
       <div className="max-w-7xl mx-auto p-6">
         <div className="flex items-center justify-center min-h-96">
           <div className="text-center">
             <LoadingSpinner size="large" className="mx-auto mb-4" />
-            <p className="text-gray-600 dark:text-gray-400">Loading latest news...</p>
+            <p className="text-gray-600 dark:text-gray-400">
+              {authLoading ? 'Authenticating...' : 'Loading latest news...'}
+            </p>
           </div>
         </div>
       </div>
@@ -135,7 +133,6 @@ export const ExplorePage: React.FC<ExplorePageProps> = ({
 
   return (
     <div className="max-w-7xl mx-auto p-6">
-      {/* Header Section */}
       <div className="mb-8">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-3">
@@ -159,10 +156,8 @@ export const ExplorePage: React.FC<ExplorePageProps> = ({
         </p>
       </div>
 
-      {/* Search and Filters */}
       <div className="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 p-6 mb-8">
         <div className="space-y-6">
-          {/* Search Bar */}
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <Search className="h-5 w-5 text-gray-400" />
@@ -176,9 +171,7 @@ export const ExplorePage: React.FC<ExplorePageProps> = ({
             />
           </div>
 
-          {/* Filters Row */}
           <div className="flex flex-wrap gap-4 items-center">
-            {/* Category Filter */}
             <div className="flex items-center space-x-2">
               <Filter className="h-4 w-4 text-gray-500" />
               <select
@@ -187,13 +180,12 @@ export const ExplorePage: React.FC<ExplorePageProps> = ({
                 className="px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-gray-500"
               >
                 <option value="">All Categories</option>
-                {availableCategories.map(category => (
+                {availableCategories.map((category) => (
                   <option key={category} value={category}>{category}</option>
                 ))}
               </select>
             </div>
 
-            {/* Sort Options */}
             <div className="flex items-center space-x-2">
               <span className="text-sm text-gray-600 dark:text-gray-400">Sort by:</span>
               <div className="flex space-x-1">
@@ -201,7 +193,7 @@ export const ExplorePage: React.FC<ExplorePageProps> = ({
                   { value: 'newest', label: 'Newest' },
                   { value: 'trending', label: 'Trending' },
                   { value: 'popular', label: 'Popular' },
-                ].map(option => (
+                ].map((option) => (
                   <button
                     key={option.value}
                     onClick={() => setSortBy(option.value as any)}
@@ -218,7 +210,6 @@ export const ExplorePage: React.FC<ExplorePageProps> = ({
             </div>
           </div>
 
-          {/* Trending Topics */}
           {trendingTopics.length > 0 && (
             <div>
               <div className="flex items-center space-x-2 mb-3">
@@ -226,7 +217,7 @@ export const ExplorePage: React.FC<ExplorePageProps> = ({
                 <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Trending Topics</span>
               </div>
               <div className="flex flex-wrap gap-2">
-                {trendingTopics.map(topic => (
+                {trendingTopics.map((topic) => (
                   <button
                     key={topic}
                     onClick={() => setSearchQuery(topic)}
@@ -241,7 +232,6 @@ export const ExplorePage: React.FC<ExplorePageProps> = ({
         </div>
       </div>
 
-      {/* Results Summary */}
       <div className="mb-6">
         <p className="text-gray-600 dark:text-gray-400">
           {filteredArticles.length} {filteredArticles.length === 1 ? 'article' : 'articles'} found
@@ -250,7 +240,6 @@ export const ExplorePage: React.FC<ExplorePageProps> = ({
         </p>
       </div>
 
-      {/* Articles Grid */}
       {visibleArticles.length === 0 ? (
         <div className="text-center py-12">
           <div className="w-24 h-24 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -265,18 +254,18 @@ export const ExplorePage: React.FC<ExplorePageProps> = ({
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {visibleArticles.map(article => (
+          {visibleArticles.map((article) => (
             <NewsCard
               key={article.id}
               article={article}
               onClick={() => onArticleClick(article)}
               layout="vertical"
+              userId={user?.id || undefined}
             />
           ))}
         </div>
       )}
 
-      {/* Load More Button */}
       {hasMore && (
         <div className="text-center mt-12">
           <button

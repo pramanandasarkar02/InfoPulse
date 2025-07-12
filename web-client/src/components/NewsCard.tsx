@@ -1,24 +1,91 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Heart, Clock, BookOpen, Star, Calendar } from 'lucide-react';
 import { NewsArticle } from '../types';
 import { addToFavorites, removeFromFavorites, rateRecommendation } from '../utils/localStorage';
+import axios from 'axios';
 
 interface NewsCardProps {
   article: NewsArticle;
   onClick: () => void;
   layout?: 'vertical' | 'horizontal';
+  userId?: string;
 }
 
-export const NewsCard: React.FC<NewsCardProps> = ({ article, onClick, layout = 'vertical' }) => {
+export const NewsCard: React.FC<NewsCardProps> = ({
+  article,
+  onClick,
+  layout = 'vertical',
+  userId,
+}) => {
   const [isFavorited, setIsFavorited] = useState(article.isFavorited || false);
   const [showRating, setShowRating] = useState(false);
   const [rating, setRating] = useState(0);
+  const isReadingRef = useRef(false);
+
+  // Log article click
+  const handleClick = async () => {
+    console.log('NewsCard clicked:', { articleId: article.id, userId });
+    try {
+      if (userId) {
+        const userIdStr = userId.toString();
+        console.log(`Sending click log for user ${userId} and article ${article.id}`);
+        const response = await axios.post('http://localhost:3006/article/click', {
+          userId: userIdStr,
+          articleId: article.id,
+        });
+        console.log(`Click logged successfully for article ${article.id}`, response.data);
+      } else {
+        console.warn('No userId provided, skipping click log');
+      }
+      isReadingRef.current = true;
+      console.log(`Set isReading to true for article ${article.id}`);
+      onClick();
+    } catch (error: any) {
+      console.error(`Failed to log click for article ${article.id}:`, {
+        message: error.message,
+        status: error.response?.status,
+        data: error.response?.data,
+      });
+    }
+  };
+
+  // Log reading time every 10 seconds
+  useEffect(() => {
+    let interval: NodeJS.Timeout | null = null;
+
+    if (isReadingRef.current && userId) {
+      console.log(`Starting reading time tracking for user ${userId} and article ${article.id}`);
+      interval = setInterval(async () => {
+        try {
+          console.log(`Sending reading log for user ${userId} and article ${article.id}`);
+          const response = await axios.post('http://localhost:3006/article/reading', {
+            userId: userId.toString(),
+            articleId: article.id,
+          });
+          console.log(`Reading time logged successfully for article ${article.id}`, response.data);
+        } catch (error: any) {
+          console.error(`Failed to log reading time for article ${article.id}:`, {
+            message: error.message,
+            status: error.response?.status,
+            data: error.response?.data,
+          });
+        }
+      }, 10000);
+    }
+
+    return () => {
+      if (interval) {
+        console.log(`Cleanup: Stopping reading time tracking for article ${article.id}`);
+        clearInterval(interval);
+      }
+    };
+  }, [userId, article.id]); // Removed isReading from dependencies since we use useRef
 
   const handleFavoriteToggle = (e: React.MouseEvent) => {
     e.stopPropagation();
     const newFavoriteStatus = !isFavorited;
     setIsFavorited(newFavoriteStatus);
-    
+
     if (newFavoriteStatus) {
       addToFavorites(article.id);
     } else {
@@ -37,7 +104,7 @@ export const NewsCard: React.FC<NewsCardProps> = ({ article, onClick, layout = '
     const date = new Date(dateString);
     const now = new Date();
     const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
-    
+
     if (diffInHours < 1) return 'Just now';
     if (diffInHours < 24) return `${diffInHours}h ago`;
     if (diffInHours < 48) return 'Yesterday';
@@ -47,7 +114,7 @@ export const NewsCard: React.FC<NewsCardProps> = ({ article, onClick, layout = '
   if (layout === 'horizontal') {
     return (
       <article className="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 overflow-hidden hover:shadow-md transition-all duration-200 cursor-pointer group">
-        <div onClick={onClick} className="md:flex">
+        <div onClick={handleClick} className="md:flex">
           <div className="md:w-1/3">
             <div className="relative">
               <img
@@ -62,7 +129,7 @@ export const NewsCard: React.FC<NewsCardProps> = ({ article, onClick, layout = '
               </div>
             </div>
           </div>
-          
+
           <div className="md:w-2/3 p-6">
             <div className="flex items-start justify-between mb-4">
               <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2 line-clamp-2 group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors duration-200">
@@ -89,7 +156,7 @@ export const NewsCard: React.FC<NewsCardProps> = ({ article, onClick, layout = '
                   >
                     <Star className="h-4 w-4" />
                   </button>
-                  
+
                   {showRating && (
                     <div className="absolute top-12 right-0 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-2 flex space-x-1 z-10">
                       {[1, 2, 3, 4, 5].map((star) => (
@@ -112,13 +179,13 @@ export const NewsCard: React.FC<NewsCardProps> = ({ article, onClick, layout = '
                 </div>
               </div>
             </div>
-            
+
             <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-2">
               {article.summary}
             </p>
 
             <div className="flex flex-wrap gap-2 mb-4">
-              {article.tags.slice(0, 3).map(tag => (
+              {article.tags.slice(0, 3).map((tag) => (
                 <span
                   key={tag}
                   className="px-2 py-1 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 rounded-md text-xs"
@@ -166,7 +233,7 @@ export const NewsCard: React.FC<NewsCardProps> = ({ article, onClick, layout = '
   // Vertical layout (for favorites page)
   return (
     <article className="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 overflow-hidden hover:shadow-md transition-all duration-200 cursor-pointer group">
-      <div onClick={onClick}>
+      <div onClick={handleClick}>
         <div className="relative">
           <img
             src={article.imageUrl}
@@ -196,7 +263,7 @@ export const NewsCard: React.FC<NewsCardProps> = ({ article, onClick, layout = '
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 line-clamp-2 group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors duration-200">
             {article.title}
           </h3>
-          
+
           <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-2">
             {article.summary}
           </p>

@@ -3,6 +3,7 @@ import { NewsCard } from './NewsCard';
 import { LoadingSpinner } from './LoadingSpinner';
 import { NewsArticle } from '../types';
 import { AlertCircle, RefreshCw } from 'lucide-react';
+import { useAuth } from '../hooks/useAuth';
 
 interface NewsFeedProps {
   articles: NewsArticle[];
@@ -12,34 +13,36 @@ interface NewsFeedProps {
   onRefresh?: () => void;
 }
 
-export const NewsFeed: React.FC<NewsFeedProps> = ({ 
-  articles, 
-  onArticleClick, 
-  loading = false, 
+export const NewsFeed: React.FC<NewsFeedProps> = ({
+  articles,
+  onArticleClick,
+  loading = false,
   error = null,
-  onRefresh
+  onRefresh,
 }) => {
+  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const [loadingMore, setLoadingMore] = useState(false);
   const [displayedArticles, setDisplayedArticles] = useState(10);
 
   const handleLoadMore = async () => {
     setLoadingMore(true);
-    // Simulate loading delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    setDisplayedArticles(prev => prev + 10);
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    setDisplayedArticles((prev) => prev + 10);
     setLoadingMore(false);
   };
 
   const visibleArticles = articles.slice(0, displayedArticles);
   const hasMore = displayedArticles < articles.length;
 
-  if (loading) {
+  if (authLoading || loading) {
     return (
       <div className="max-w-4xl mx-auto p-6">
         <div className="flex items-center justify-center min-h-96">
           <div className="text-center">
             <LoadingSpinner size="large" className="mx-auto mb-4" />
-            <p className="text-gray-600 dark:text-gray-400">Loading your personalized news feed...</p>
+            <p className="text-gray-600 dark:text-gray-400">
+              {authLoading ? 'Authenticating...' : 'Loading your personalized news feed...'}
+            </p>
           </div>
         </div>
       </div>
@@ -111,19 +114,18 @@ export const NewsFeed: React.FC<NewsFeedProps> = ({
         </p>
       </div>
 
-      {/* Single Column Layout */}
       <div className="space-y-6">
-        {visibleArticles.map(article => (
+        {visibleArticles.map((article) => (
           <NewsCard
             key={article.id}
             article={article}
             onClick={() => onArticleClick(article)}
             layout="horizontal"
+            userId={user?.id || undefined}
           />
         ))}
       </div>
 
-      {/* Load More Button */}
       {hasMore && (
         <div className="text-center mt-12">
           <button
