@@ -1,35 +1,86 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NewsCard } from './NewsCard';
 import { LoadingSpinner } from './LoadingSpinner';
-import { NewsArticle } from '../types';
+import { NewsArticle, Category } from '../types';
 import { AlertCircle, RefreshCw } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
+import { NewsApiService } from '../services/newsApi';
 
 interface NewsFeedProps {
-  articles: NewsArticle[];
   onArticleClick: (article: NewsArticle) => void;
-  loading?: boolean;
-  error?: string | null;
-  onRefresh?: () => void;
 }
 
-export const NewsFeed: React.FC<NewsFeedProps> = ({
-  articles,
-  onArticleClick,
-  loading = false,
-  error = null,
-  onRefresh,
-}) => {
+export const NewsFeed: React.FC<NewsFeedProps> = ({ onArticleClick }) => {
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
-  const [loadingMore, setLoadingMore] = useState(false);
+  const [articles, setArticles] = useState<NewsArticle[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
   const [displayedArticles, setDisplayedArticles] = useState(10);
+  const [loadingMore, setLoadingMore] = useState(false);
+
+  const getUserId = (): string | null => {
+    try {
+      return localStorage.getItem('infopulse_user_id') || user?.id || null;
+    } catch (error) {
+      console.error('Error retrieving user ID from localStorage:', error);
+      return user?.id || null;
+    }
+  };
+
+  const fetchNewsFeed = async () => {
+    setLoading(true);
+    setError(null);
+    const userId = getUserId();
+    try {
+      let fetchedArticles: NewsArticle[] = [];
+      if (isAuthenticated && userId) {
+        // Fetch personalized recommendations for authenticated users
+        fetchedArticles = await NewsApiService.fetchRecommendations(userId);
+        // Fetch user categories
+        const userCategories = await NewsApiService.fetchCategories(userId);
+        setCategories(userCategories);
+      } else {
+        // Fetch general articles for unauthenticated users
+        fetchedArticles = await NewsApiService.fetchArticles();
+      }
+      setArticles(fetchedArticles);
+    } catch (err) {
+      setError('Failed to load news feed. Please try again later.');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSaveArticle = async (articleId: string) => {
+    const userId = getUserId();
+    if (!isAuthenticated || !userId) {
+      setError('Please log in to save articles.');
+      return;
+    }
+    const success = await NewsApiService.saveArticle(userId, articleId);
+    if (success) {
+      setArticles((prev) =>
+        prev.map((article) =>
+          article.id === articleId ? { ...article, isFavorited: true } : article
+        )
+      );
+    } else {
+      setError('Failed to save article. Please try again.');
+    }
+  };
 
   const handleLoadMore = async () => {
     setLoadingMore(true);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate network delay
     setDisplayedArticles((prev) => prev + 10);
     setLoadingMore(false);
   };
+
+  useEffect(() => {
+    fetchNewsFeed();
+  }, [isAuthenticated, user?.id]);
 
   const visibleArticles = articles.slice(0, displayedArticles);
   const hasMore = displayedArticles < articles.length;
@@ -59,15 +110,13 @@ export const NewsFeed: React.FC<NewsFeedProps> = ({
               Failed to Load News
             </h3>
             <p className="text-gray-600 dark:text-gray-400 mb-4">{error}</p>
-            {onRefresh && (
-              <button
-                onClick={onRefresh}
-                className="flex items-center space-x-2 px-4 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors duration-200"
-              >
-                <RefreshCw className="h-4 w-4" />
-                <span>Try Again</span>
-              </button>
-            )}
+            <button
+              onClick={fetchNewsFeed}
+              className="flex items-center space-x-2 px-4 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors duration-200"
+            >
+              <RefreshCw className="h-4 w-4" />
+              <span>Try Again</span>
+            </button>
           </div>
         </div>
       </div>
@@ -86,17 +135,17 @@ export const NewsFeed: React.FC<NewsFeedProps> = ({
               No articles found
             </h3>
             <p className="text-gray-600 dark:text-gray-400 mb-4">
-              Try adjusting your search or filters to find more content.
+              {isAuthenticated
+                ? 'No articles match your preferences. Try adjusting your categories.'
+                : 'Try searching for articles or log in for personalized recommendations.'}
             </p>
-            {onRefresh && (
-              <button
-                onClick={onRefresh}
-                className="flex items-center space-x-2 px-4 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors duration-200"
-              >
-                <RefreshCw className="h-4 w-4" />
-                <span>Refresh</span>
-              </button>
-            )}
+            <button
+              onClick={fetchNewsFeed}
+              className="flex items-center space-x-2 px-4 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors duration-200"
+            >
+              <RefreshCw className="h-4 w-4" />
+              <span>Refresh</span>
+            </button>
           </div>
         </div>
       </div>
@@ -107,12 +156,30 @@ export const NewsFeed: React.FC<NewsFeedProps> = ({
     <div className="max-w-4xl mx-auto p-6">
       <div className="mb-8">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-          Latest News
+          {isAuthenticated ? 'Your Personalized News' : 'Latest News'}
         </h2>
         <p className="text-gray-600 dark:text-gray-400">
           {articles.length} {articles.length === 1 ? 'article' : 'articles'} found
+          {isAuthenticated && categories.length > 0 && (
+            <span>
+              {' '}
+              in {categories.map((c) => c.name).join(', ')}
+            </span>
+          )}
         </p>
       </div>
+
+      {/* show user id and categories
+      {isAuthenticated && (
+        <div className="mb-4">
+          <p className="text-gray-600 dark:text-gray-400">
+            User ID: {user?.id}
+          </p>
+          <p className="text-gray-600 dark:text-gray-400">
+            Categories: {categories.map((c) => c.name).join(', ')}
+          </p>
+        </div>
+      )} */}
 
       <div className="space-y-6">
         {visibleArticles.map((article) => (
@@ -120,8 +187,9 @@ export const NewsFeed: React.FC<NewsFeedProps> = ({
             key={article.id}
             article={article}
             onClick={() => onArticleClick(article)}
+            // onSave={() => handleSaveArticle(article.id)}
             layout="horizontal"
-            userId={user?.id || undefined}
+            // userId={getUserId()}
           />
         ))}
       </div>

@@ -20,16 +20,18 @@ export interface AuthState {
 const STORAGE_KEY = 'infopulse_auth';
 const TOKEN_KEY = 'infopulse_token';
 const REFRESH_TOKEN_KEY = 'infopulse_refresh_token';
+const USER_ID_KEY = 'infopulse_user_id'; // New key for user ID
 
 export const useAuth = () => {
   const [authState, setAuthState] = useState<AuthState>(() => {
     try {
       const storedUser = localStorage.getItem(STORAGE_KEY);
       const token = localStorage.getItem(TOKEN_KEY);
-      console.log('Initializing auth state:', { storedUser, token });
+      const userId = localStorage.getItem(USER_ID_KEY);
+      console.log('Initializing auth state:', { storedUser, token, userId });
       return {
         user: storedUser ? JSON.parse(storedUser) : null,
-        isAuthenticated: !!token,
+        isAuthenticated: !!token && !!userId,
         isLoading: true,
       };
     } catch (error) {
@@ -46,10 +48,11 @@ export const useAuth = () => {
     const validateToken = async () => {
       const token = localStorage.getItem(TOKEN_KEY);
       const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
+      const userId = localStorage.getItem(USER_ID_KEY);
 
-      if (!token) {
-        console.log('No token found in localStorage');
-        setAuthState(prev => ({ ...prev, isLoading: false }));
+      if (!token || !userId) {
+        console.log('No token or user ID found in localStorage');
+        setAuthState((prev) => ({ ...prev, isLoading: false }));
         return;
       }
 
@@ -61,6 +64,7 @@ export const useAuth = () => {
         const user = response.data.user;
         console.log('Token validation successful, user:', user);
         localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
+        localStorage.setItem(USER_ID_KEY, user.id); // Ensure user ID is stored
         setAuthState({
           user,
           isAuthenticated: true,
@@ -84,6 +88,7 @@ export const useAuth = () => {
 
             localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
             localStorage.setItem(TOKEN_KEY, newToken);
+            localStorage.setItem(USER_ID_KEY, user.id); // Store user ID
             setAuthState({
               user,
               isAuthenticated: true,
@@ -98,6 +103,7 @@ export const useAuth = () => {
             localStorage.removeItem(STORAGE_KEY);
             localStorage.removeItem(TOKEN_KEY);
             localStorage.removeItem(REFRESH_TOKEN_KEY);
+            localStorage.removeItem(USER_ID_KEY);
             setAuthState({
               user: null,
               isAuthenticated: false,
@@ -108,6 +114,7 @@ export const useAuth = () => {
           localStorage.removeItem(STORAGE_KEY);
           localStorage.removeItem(TOKEN_KEY);
           localStorage.removeItem(REFRESH_TOKEN_KEY);
+          localStorage.removeItem(USER_ID_KEY);
           setAuthState({
             user: null,
             isAuthenticated: false,
@@ -131,6 +138,7 @@ export const useAuth = () => {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
         localStorage.setItem(TOKEN_KEY, token);
         localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
+        localStorage.setItem(USER_ID_KEY, user.id); // Store user ID
       } catch (error) {
         console.error('Error saving to localStorage:', error);
         return false;
@@ -167,6 +175,7 @@ export const useAuth = () => {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
         localStorage.setItem(TOKEN_KEY, token);
         localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
+        localStorage.setItem(USER_ID_KEY, user.id); // Store user ID
       } catch (error) {
         console.error('Error saving to localStorage:', error);
         return false;
@@ -193,6 +202,7 @@ export const useAuth = () => {
       localStorage.removeItem(STORAGE_KEY);
       localStorage.removeItem(TOKEN_KEY);
       localStorage.removeItem(REFRESH_TOKEN_KEY);
+      localStorage.removeItem(USER_ID_KEY); // Remove user ID
       console.log('Logged out, cleared localStorage');
     } catch (error) {
       console.error('Error clearing localStorage:', error);
