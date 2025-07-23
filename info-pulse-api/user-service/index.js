@@ -550,6 +550,22 @@ app.delete('/api/admin/categories/:id', authenticateToken, requireAdmin, async (
   }
 });
 
+// get user categories
+app.get('/api/user/categories/:user_id', async (req, res) => {
+  const userId = req.params.user_id;
+  try {
+    const result = await pool.query(
+      'SELECT id, name FROM news_categories WHERE id IN (SELECT category_id FROM user_topics WHERE user_id = $1) ORDER BY name ASC',
+      [userId]
+    );
+    res.json({ categories: result.rows });
+  } catch (error) {
+    console.error('Get categories error:', error.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+})
+
+
 // Health check
 app.get('/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
