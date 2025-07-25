@@ -14,7 +14,7 @@ import { UsersManagement } from './components/UsersManagement';
 import { CategoriesManagement } from './components/CategoriesManagement';
 import { useNews } from './hooks/useNews';
 import { useAuth } from './hooks/useAuth';
-import { NewsArticle, CurrentPage, SearchFilters, User } from './types';
+import { NewsArticle, CurrentPage, SearchFilters, User } from './types/index';
 
 const App: React.FC = () => {
   const {
@@ -115,10 +115,10 @@ const App: React.FC = () => {
         if (!isAuthenticated) {
           return (
             <NewsFeed
-              articles={articles}
+              // articles={articles}
               onArticleClick={handleArticleClick}
-              loading={newsLoading}
-              error={newsError}
+              // loading={newsLoading}
+              // error={newsError}
             />
           );
         }
@@ -132,10 +132,10 @@ const App: React.FC = () => {
         if (!isAuthenticated) {
           return (
             <NewsFeed
-              articles={articles}
+              // articles={articles}
               onArticleClick={handleArticleClick}
-              loading={newsLoading}
-              error={newsError}
+              // loading={newsLoading}
+              // error={newsError}
             />
           );
         }
@@ -156,10 +156,10 @@ const App: React.FC = () => {
         if (!isAuthenticated || !user?.is_admin) {
           return (
             <NewsFeed
-              articles={articles}
+              // articles={articles}
               onArticleClick={handleArticleClick}
-              loading={newsLoading}
-              error={newsError}
+              // loading={newsLoading}
+              // error={newsError}
             />
           );
         }
@@ -168,10 +168,10 @@ const App: React.FC = () => {
         if (!isAuthenticated || !user?.is_admin) {
           return (
             <NewsFeed
-              articles={articles}
+              // articles={articles}
               onArticleClick={handleArticleClick}
-              loading={newsLoading}
-              error={newsError}
+              // loading={newsLoading}
+              // error={newsError}
             />
           );
         }
@@ -180,10 +180,10 @@ const App: React.FC = () => {
         if (!isAuthenticated || !user?.is_admin) {
           return (
             <NewsFeed
-              articles={articles}
+              // articles={articles}
               onArticleClick={handleArticleClick}
-              loading={newsLoading}
-              error={newsError}
+              // loading={newsLoading}
+              // error={newsError}
             />
           );
         }
@@ -192,10 +192,10 @@ const App: React.FC = () => {
         if (!isAuthenticated || !user?.is_admin) {
           return (
             <NewsFeed
-              articles={articles}
+              // articles={articles}
               onArticleClick={handleArticleClick}
-              loading={newsLoading}
-              error={newsError}
+              // loading={newsLoading}
+              // error={newsError}
             />
           );
         }
@@ -203,10 +203,10 @@ const App: React.FC = () => {
       default:
         return (
           <NewsFeed
-            articles={articles}
+            // articles={articles}
             onArticleClick={handleArticleClick}
-            loading={newsLoading}
-            error={newsError}
+            // loading={newsLoading}
+            // error={newsError}
           />
         );
     }
