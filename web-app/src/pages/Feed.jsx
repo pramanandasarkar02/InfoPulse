@@ -40,7 +40,8 @@ const Feed = () => {
     setLoading(true);
     try {
       const response = await recommendations.recommendationByCategory();
-      const shuffledArticles = shuffleArray(response.data.articles);
+      console.log(response);
+      const shuffledArticles = shuffleArray(response);
       setArticles(shuffledArticles);
       setFilteredArticles(shuffledArticles);
     } catch (error) {

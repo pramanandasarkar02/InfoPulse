@@ -441,7 +441,21 @@ class NewsService {
     });
     return params.toString();
   }
+  async getStats(){
+    try {
+      const response = await axios.get(
+        `${API_BASE_URL}/stats`
+      );
+      return { data: response.data };
+    } catch (error) {
+      return { 
+        error: error.response?.data?.error || 'Failed to fetch processing statistics' 
+      };
+    }
+  } 
 }
+
+
 
 // Create singleton instance
 const newsService = new NewsService();

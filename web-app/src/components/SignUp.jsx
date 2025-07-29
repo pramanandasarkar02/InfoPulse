@@ -1,28 +1,35 @@
-import React, { useState } from 'react'
-import { authService } from '../services/AuthService'
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { authService } from '../services/AuthService';
 
 const SignUp = () => {
-  const [username, setUsername] = useState('')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
-  const [error, setError] = useState('')
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState('');
+  const navigate = useNavigate(); // Hook for navigation
 
   const handleSignUp = async (e) => {
-    e.preventDefault()
-    
+    e.preventDefault();
+
     if (confirmPassword !== password) {
-      setError('Passwords do not match')
-      return
+      setError('Passwords do not match');
+      return;
     }
-    
+
     try {
-      const response = await authService.signup({ username, email, password })
-      // Handle successful signup (redirect or show success message)
+      const response = await authService.signup({ username, email, password });
+      if (response.error) {
+        setError(response.error || 'Signup failed');
+        return;
+      }
+      // Redirect to /explore on successful signup
+      navigate('/explore');
     } catch (err) {
-      setError(err.message || 'Signup failed')
+      setError(err.message || 'Signup failed');
     }
-  }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -30,13 +37,13 @@ const SignUp = () => {
         <div className="text-center">
           <h1 className="text-3xl font-bold text-gray-900">Create an account</h1>
         </div>
-        
+
         {error && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
             {error}
           </div>
         )}
-        
+
         <form className="mt-8 space-y-6" onSubmit={handleSignUp}>
           <div className="rounded-md shadow-sm space-y-4">
             <div>
@@ -90,7 +97,7 @@ const SignUp = () => {
             </button>
           </div>
         </form>
-        
+
         <div className="text-center text-sm">
           <p className="text-gray-600">
             Already have an account?{' '}
@@ -101,7 +108,7 @@ const SignUp = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default SignUp
+export default SignUp;

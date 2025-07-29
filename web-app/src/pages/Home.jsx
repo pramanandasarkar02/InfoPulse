@@ -1,9 +1,36 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaNewspaper, FaSearch, FaBookmark, FaBell, FaRocket } from 'react-icons/fa';
+import newsService from '../services/NewsService';
 
 const HomePage = () => {
     const navigate = useNavigate();
+    const [statistics, setStatistics] = useState([]);
+
+    useEffect(() => {
+        const fetchStats = async () => {
+            try {
+                const getStats = await newsService.getStats();
+                console.log(getStats.data);
+                const mockStats = [
+                    { name: 'Total Articles', value: getStats.data.totalArticles },
+                    { name: 'Active Users', value: getStats.data.totalUser },
+                    { name: 'Categories', value: getStats.data.totalCategory },
+                ];
+                setStatistics(mockStats);
+            } catch (error) {
+                console.error("Failed to fetch statistics:", error);
+                // Fallback data in case API fails
+                setStatistics([
+                    { name: 'Total Articles', value: '10K+' },
+                    { name: 'Active Users', value: '5K+' },
+                    { name: 'Categories', value: '50+' },
+                ]);
+            }
+        };
+
+        fetchStats();
+    }, []);
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
@@ -59,10 +86,26 @@ const HomePage = () => {
                 </div>
             </div>
 
+            {/* Stats Section */}
+            {statistics.length > 0 && (
+                <div className="bg-indigo-50 py-12">
+                    <div className="container mx-auto px-6">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            {statistics.map((stat, index) => (
+                                <div key={index} className="bg-white p-6 rounded-lg shadow-sm text-center">
+                                    <p className="text-3xl font-bold text-blue-600 mb-2">{stat.value}</p>
+                                    <p className="text-gray-600">{stat.name}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Features Section */}
             <div className="bg-white py-16">
                 <div className="container mx-auto px-6">
-                    <h2 className="text-3xl font-bold text-center text-gray-800 mb-12">Why Choose NewsHub?</h2>
+                    <h2 className="text-3xl font-bold text-center text-gray-800 mb-12">Why Choose InfoPulse?</h2>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                         <div className="bg-blue-50 p-6 rounded-xl">
                             <div className="bg-blue-100 w-12 h-12 rounded-full flex items-center justify-center mb-4">
@@ -110,8 +153,6 @@ const HomePage = () => {
                     </button>
                 </div>
             </div>
-
-            
         </div>
     );
 };

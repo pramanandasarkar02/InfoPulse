@@ -466,6 +466,25 @@ app.post('/articles', createProxyMiddleware({
     }   
 }))
 
+app.get('/stats', createProxyMiddleware({
+    target: SERVICES.NEWS_PROCESSING,
+    changeOrigin: true,
+    pathRewrite: {
+        '^/stats': '/stats'
+    },
+    onError: (err, req, res) => {
+        logger.error('News processing service proxy error:', err);  
+        res.status(503).json({ error: 'News processing service unavailable' });
+    },
+    onProxyReq: (proxyReq, req, res) => {
+        logger.info(`Proxying ${req.method} ${req.originalUrl} to news processing service`);
+        // Log full info for debugging
+        logger.info('Query:', req.query);
+        logger.info('Params:', req.params);
+        logger.info('Body:', req.body);
+    }
+}))
+
 
 app.get('/articles/title/:title', createProxyMiddleware({
     target: SERVICES.NEWS_PROCESSING,

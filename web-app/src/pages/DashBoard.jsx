@@ -38,11 +38,14 @@ const Dashboard = () => {
           setCategories(response.data.categories);
         }
         else if (currentPage === 'stats') {
+          
+          const getStats = await newsService.getStats();
+          console.log(getStats.data)
           const mockStats = [
-            { name: 'Total Articles', value: 1245 },
-            { name: 'Active Users', value: 843 },
-            { name: 'Categories', value: 12 },
-            { name: 'Daily Views', value: 3562 }
+            { name: 'Total Articles', value: getStats.data.totalArticles },
+            { name: 'Active Users', value: getStats.data.totalUser },
+            { name: 'Categories', value: getStats.data.totalCategory },
+
           ];
           setStatistics(mockStats);
         }

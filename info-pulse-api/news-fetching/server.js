@@ -191,7 +191,7 @@ app.get('/categories', async (req, res) => {
 // Get all articles with optional category filter
 app.get('/articles', async (req, res) => {
   try {
-    const { category, limit = 50 } = req.query;
+    const { category, limit = 300 } = req.query;
     
     // Build query filter
     const filter = {};
@@ -203,7 +203,7 @@ app.get('/articles', async (req, res) => {
     const articles = await collection
       .find(filter)
       .sort({ createdAt: -1 })
-      // .limit(parseInt(limit))
+      .limit(parseInt(limit))
       .toArray();
       
     res.json({ 
@@ -296,7 +296,7 @@ app.get('/stats', async (req, res) => {
 const startServer = async () => {
   try {
     await connectToMongoDB();
-    // startNewsFetching(); // Uncomment this to start automatic news fetching
+    // startNewsFetching(); // automatic news fetching
     
     app.listen(port, () => {
       console.log(`Server is running on port ${port}`);

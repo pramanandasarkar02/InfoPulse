@@ -893,6 +893,18 @@ app.delete('/api/duplicates/cleanup', async (req, res) => {
     }
 });
 
+app.get('/stats', async (req, res) => {
+    const totalArticles = await pool.query('SELECT COUNT(*) FROM articles');
+    const totalUser = await pool.query('SELECT COUNT(*) FROM users');
+    const totalCategory = await pool.query('SELECT COUNT(*) FROM news_categories');
+    
+    res.json({
+        totalArticles: totalArticles.rows[0].count,
+        totalUser: totalUser.rows[0].count,
+        totalCategory: totalCategory.rows[0].count
+    });
+})
+
 // Health check
 app.get('/health', async (req, res) => {
     try {

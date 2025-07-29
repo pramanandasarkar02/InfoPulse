@@ -1,27 +1,31 @@
-import React, { useState } from 'react'
-import { authService } from '../services/AuthService'
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { authService } from '../services/AuthService';
 
 const Login = () => {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [authError, setAuthError] = useState('')
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [authError, setAuthError] = useState('');
+  const navigate = useNavigate(); // Hook for navigation
 
   const handleLogin = async (e) => {
-    e.preventDefault()
-    
+    e.preventDefault();
+
     try {
-      const login = await authService.login({email, password })
+      const login = await authService.login({ email, password });
       if (login.error) {
-        setAuthError(login.error)
-        return false
+        setAuthError(login.error);
+        return false;
       }
-      setUser(authService.getCurrentUser())
-      return true
+      // Assuming authService.getCurrentUser() sets or retrieves user data
+      // setUser(authService.getCurrentUser()); // Uncomment if needed
+      navigate('/explore'); // Redirect to /explore on successful login
+      return true;
     } catch (err) {
-      setAuthError(err.message || 'Login failed')
-      return false
+      setAuthError(err.message || 'Login failed');
+      return false;
     }
-  }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -29,13 +33,13 @@ const Login = () => {
         <div className="text-center">
           <h1 className="text-3xl font-bold text-gray-900">Log in to your account</h1>
         </div>
-        
+
         {authError && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
             {authError}
           </div>
         )}
-        
+
         <form className="mt-8 space-y-6" onSubmit={handleLogin}>
           <div className="rounded-md shadow-sm space-y-4">
             <div>
@@ -45,10 +49,7 @@ const Login = () => {
                 className="appearance-none rounded relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
                 placeholder="Enter email"
                 value={email}
-                onChange={(e) =>{ 
-                    // console.log(email)
-                    setEmail(e.target.value)
-                }}
+                onChange={(e) => setEmail(e.target.value)}
               />
             </div>
             <div>
@@ -72,7 +73,7 @@ const Login = () => {
             </button>
           </div>
         </form>
-        
+
         <div className="text-center text-sm">
           <p className="text-gray-600">
             Don't have an account?{' '}
@@ -83,7 +84,7 @@ const Login = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Login
+export default Login;
