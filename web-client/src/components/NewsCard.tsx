@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Heart, Clock, BookOpen, Star, Calendar } from 'lucide-react';
-import { NewsArticle } from '../types';
+
 import { addToFavorites, removeFromFavorites, rateRecommendation } from '../utils/localStorage';
 import axios from 'axios';
+import { NewsArticle } from '../services/NewsService';
 
 interface NewsCardProps {
   article: NewsArticle;

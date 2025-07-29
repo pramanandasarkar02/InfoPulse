@@ -1,23 +1,46 @@
 {
-  "name": "api-gateway",
+  "name": "info-pulse-api-gateway",
   "version": "1.0.0",
-  "description": "",
-  "main": "main.js",
+  "description": "API Gateway for Info Pulse News Microservices",
+  "main": "gateway.js",
+  "type": "module",
   "scripts": {
+    "start": "node gateway.js",
+    "dev": "nodemon gateway.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon main.js"
+    "lint": "eslint .",
+    "docker:build": "docker build -t info-pulse-gateway .",
+    "docker:run": "docker run -p 8080:8080 info-pulse-gateway"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
+  "keywords": [
+    "api-gateway",
+    "microservices",
+    "news",
+    "proxy",
+    "authentication",
+    "rate-limiting"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
   "dependencies": {
+    "express": "^4.18.2",
     "cors": "^2.8.5",
-    "express": "^5.1.0",
-    "express-rate-limit": "^7.5.1",
-    "helmet": "^8.1.0",
-    "http-proxy-middleware": "^3.0.5",
-    "morgan": "^1.10.0",
-    "nodemon": "^3.1.10"
+    "http-proxy-middleware": "^2.0.6",
+    "express-rate-limit": "^7.1.5",
+    "helmet": "^7.1.0",
+    "compression": "^1.7.4",
+    "jsonwebtoken": "^9.0.2",
+    "axios": "^1.6.2",
+    "dotenv": "^16.3.1",
+    "winston": "^3.11.0",
+    "express-winston": "^4.2.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2",
+    "eslint": "^8.55.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
   }
 }

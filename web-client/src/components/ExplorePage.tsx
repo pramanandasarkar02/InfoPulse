@@ -4,6 +4,7 @@ import { NewsCard } from './NewsCard';
 import { LoadingSpinner } from './LoadingSpinner';
 import { NewsArticle } from '../types';
 import { useAuth } from '../hooks/useAuth';
+import newsService from '../services/NewsService';
 
 interface ExplorePageProps {
   articles: NewsArticle[];
@@ -17,17 +18,26 @@ interface ExplorePageProps {
 export const ExplorePage: React.FC<ExplorePageProps> = ({
   articles,
   onArticleClick,
-  availableCategories,
   loading = false,
   error = null,
   onRefresh,
 }) => {
+  const [availableCategories, setAvailableCategories] = useState<string[]>([]);
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [sortBy, setSortBy] = useState<'newest' | 'trending' | 'popular'>('newest');
   const [loadingMore, setLoadingMore] = useState(false);
-  const [displayedArticles, setDisplayedArticles] = useState(12);
+  const [displayedArticles, setDisplayedArticles] = useState(16);
+
+  useState(()=> {
+    const fetchCategories = async () => {
+      const allcategories = await newsService.getCategories();
+      console.log(allcategories)
+      setAvailableCategories(allcategories?.data || []);
+    }
+    
+  }, [])
 
   const filteredArticles = useMemo(() => {
     let filtered = [...articles];
@@ -67,6 +77,8 @@ export const ExplorePage: React.FC<ExplorePageProps> = ({
 
     return filtered;
   }, [articles, searchQuery, selectedCategory, sortBy]);
+
+
 
   const handleLoadMore = async () => {
     setLoadingMore(true);

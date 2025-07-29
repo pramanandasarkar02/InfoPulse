@@ -1,3 +1,4 @@
+// App.tsx
 import React, { useState, useEffect } from 'react';
 import { Header } from './components/Header';
 import { Sidebar } from './components/Sidebar';
@@ -12,53 +13,73 @@ import { AdminDashboard } from './components/AdminDashboard';
 import { NewsUploadPage } from './components/NewsUploadPage';
 import { UsersManagement } from './components/UsersManagement';
 import { CategoriesManagement } from './components/CategoriesManagement';
-import { useNews } from './hooks/useNews';
-import { useAuth } from './hooks/useAuth';
-import { NewsArticle, CurrentPage, SearchFilters, User } from './types/index';
+import { NewsArticle } from './services/NewsService';
+import authService, { User } from './services/AuthService';
+
+type CurrentPage = 'feed' | 'explore' | 'favorites' | 'settings' | 'admin' | 'upload' | 'users' | 'categories' | 'article';
+
+interface Filters {
+  category?: string;
+  search?: string;
+}
+
+interface Preferences {
+  theme?: 'light' | 'dark';
+  notifications?: boolean;
+}
 
 const App: React.FC = () => {
-  const {
-    articles,
-    favoriteArticles,
-    availableCategories,
-    filters,
-    setFilters,
-    preferences,
-    setPreferences,
-    loading: newsLoading,
-    error: newsError,
-    refreshArticles,
-  } = useNews();
-
-  const { user, isAuthenticated, isLoading: authLoading, login, register, logout } = useAuth();
   const [currentPage, setCurrentPage] = useState<CurrentPage>('feed');
   const [selectedArticle, setSelectedArticle] = useState<NewsArticle | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
   const [intendedPage, setIntendedPage] = useState<CurrentPage | null>(null);
+  const [user, setUser] = useState<User | null>(authService.getCurrentUser());
+  const [authLoading, setAuthLoading] = useState(true);
+  const [filters, setFilters] = useState<Filters>({});
+  const [articles, setArticles] = useState<NewsArticle[]>([]);
+  const [favoriteArticles, setFavoriteArticles] = useState<NewsArticle[]>([]);
+  const [availableCategories, setAvailableCategories] = useState<string[]>([]);
+  const [newsLoading, setNewsLoading] = useState(false);
+  const [newsError, setNewsError] = useState<string | null>(null);
+  const [preferences, setPreferences] = useState<Preferences>({ theme: 'light', notifications: true });
 
-  useEffect(() => {
-    console.log('Auth state:', { user, isAuthenticated, isLoading: authLoading });
-  }, [user, isAuthenticated, authLoading]);
-
-  const handlePageChange = (page: CurrentPage) => {
-    if (!isAuthenticated && (page === 'favorites' || page === 'settings' || page === 'admin' || page === 'upload' || page === 'users' || page === 'categories')) {
-      setIntendedPage(page);
-      setShowAuthModal(true);
-      return;
+  const refreshArticles = async () => {
+    setNewsLoading(true);
+    try {
+      // Assuming newsService exists and is imported
+      // const response = await newsService.getArticles(filters);
+      // setArticles(response.data);
+      setNewsError(null);
+    } catch (error) {
+      setNewsError('Failed to load articles');
+    } finally {
+      setNewsLoading(false);
     }
-    if ((page === 'admin' || page === 'upload' || page === 'users' || page === 'categories') && !user?.is_admin) {
-      setAuthError('Access denied: Admin privileges required');
-      return;
-    }
-    setCurrentPage(page);
-    setIntendedPage(null);
   };
 
   useEffect(() => {
-    if (isAuthenticated && intendedPage) {
-      if ((intendedPage === 'admin' || intendedPage === 'upload' || intendedPage === 'users' || intendedPage === 'categories') && !user?.is_admin) {
+    const initialize = async () => {
+      setAuthLoading(true);
+      const isAuthenticated = await authService.refreshAuth();
+      if (isAuthenticated) {
+        setUser(authService.getCurrentUser());
+      }
+      setAuthLoading(false);
+      setAvailableCategories(['politics', 'technology', 'sports']);
+      refreshArticles();
+    };
+
+    initialize();
+  }, []);
+
+  useEffect(() => {
+    if (authService.isAuthenticated() && intendedPage) {
+      if (
+        (intendedPage === 'admin' || intendedPage === 'upload' || intendedPage === 'users' || intendedPage === 'categories') &&
+        user?.role !== 'admin'
+      ) {
         setAuthError('Access denied: Admin privileges required');
         return;
       }
@@ -66,7 +87,21 @@ const App: React.FC = () => {
       setShowAuthModal(false);
       setIntendedPage(null);
     }
-  }, [isAuthenticated, intendedPage, user]);
+  }, [user, intendedPage]);
+
+  const handlePageChange = (page: CurrentPage) => {
+    if (!authService.isAuthenticated() && ['favorites', 'settings', 'admin', 'upload', 'users', 'categories'].includes(page)) {
+      setIntendedPage(page);
+      setShowAuthModal(true);
+      return;
+    }
+    if (['admin', 'upload', 'users', 'categories'].includes(page) && user?.role !== 'admin') {
+      setAuthError('Access denied: Admin privileges required');
+      return;
+    }
+    setCurrentPage(page);
+    setIntendedPage(null);
+  };
 
   const handleArticleClick = (article: NewsArticle) => {
     setSelectedArticle(article);
@@ -80,22 +115,32 @@ const App: React.FC = () => {
 
   const handleLogin = async (username: string, password: string) => {
     setAuthError(null);
-    const success = await login(username, password);
-    if (!success) {
-      setAuthError('Invalid username or password');
+    const response = await authService.login({ username, password });
+    if (response.error) {
+      setAuthError(response.error);
       return false;
     }
+    setUser(authService.getCurrentUser());
     return true;
   };
 
   const handleRegister = async (username: string, email: string, password: string) => {
     setAuthError(null);
-    const success = await register(username, email, password);
-    if (!success) {
-      setAuthError('Registration failed. Username or email may already exist.');
+    const response = await authService.signup({ username, email, password, confirmPassword: password });
+    if (response.error) {
+      setAuthError(response.error);
       return false;
     }
+    setUser(authService.getCurrentUser());
     return true;
+  };
+
+  const logout = () => {
+    authService.logout();
+    setUser(null);
+    setCurrentPage('feed');
+    setShowAuthModal(false);
+    setFavoriteArticles([]);
   };
 
   const renderCurrentPage = () => {
@@ -112,103 +157,49 @@ const App: React.FC = () => {
           />
         );
       case 'favorites':
-        if (!isAuthenticated) {
-          return (
-            <NewsFeed
-              // articles={articles}
-              onArticleClick={handleArticleClick}
-              // loading={newsLoading}
-              // error={newsError}
-            />
-          );
+        if (!authService.isAuthenticated()) {
+          setShowAuthModal(true);
+          return <NewsFeed  onArticleClick={handleArticleClick} />;
         }
-        return (
-          <FavoritesPage
-            articles={favoriteArticles}
-            onArticleClick={handleArticleClick}
-          />
-        );
+        return <FavoritesPage articles={favoriteArticles} onArticleClick={handleArticleClick} />;
       case 'settings':
-        if (!isAuthenticated) {
-          return (
-            <NewsFeed
-              // articles={articles}
-              onArticleClick={handleArticleClick}
-              // loading={newsLoading}
-              // error={newsError}
-            />
-          );
+        if (!authService.isAuthenticated()) {
+          setShowAuthModal(true);
+          return <NewsFeed  onArticleClick={handleArticleClick} />;
         }
-        return (
-          <SettingsPage
-            preferences={preferences}
-            onPreferencesChange={setPreferences}
-          />
-        );
+        return <SettingsPage preferences={preferences} onPreferencesChange={setPreferences} />;
       case 'article':
         return selectedArticle ? (
-          <ArticleDetail
-            article={selectedArticle}
-            onBack={handleBackToFeed}
-          />
-        ) : null;
-      case 'admin':
-        if (!isAuthenticated || !user?.is_admin) {
-          return (
-            <NewsFeed
-              // articles={articles}
-              onArticleClick={handleArticleClick}
-              // loading={newsLoading}
-              // error={newsError}
-            />
-          );
-        }
-        return <AdminDashboard user={user} onPageChange={handlePageChange} />;
-      case 'upload':
-        if (!isAuthenticated || !user?.is_admin) {
-          return (
-            <NewsFeed
-              // articles={articles}
-              onArticleClick={handleArticleClick}
-              // loading={newsLoading}
-              // error={newsError}
-            />
-          );
-        }
-        return <NewsUploadPage user={user} />;
-      case 'users':
-        if (!isAuthenticated || !user?.is_admin) {
-          return (
-            <NewsFeed
-              // articles={articles}
-              onArticleClick={handleArticleClick}
-              // loading={newsLoading}
-              // error={newsError}
-            />
-          );
-        }
-        return <UsersManagement user={user} />;
-      case 'categories':
-        if (!isAuthenticated || !user?.is_admin) {
-          return (
-            <NewsFeed
-              // articles={articles}
-              onArticleClick={handleArticleClick}
-              // loading={newsLoading}
-              // error={newsError}
-            />
-          );
-        }
-        return <CategoriesManagement user={user} />;
-      default:
-        return (
-          <NewsFeed
-            // articles={articles}
-            onArticleClick={handleArticleClick}
-            // loading={newsLoading}
-            // error={newsError}
-          />
+          <ArticleDetail article={selectedArticle} onBack={handleBackToFeed} />
+        ) : (
+          <NewsFeed  onArticleClick={handleArticleClick} />
         );
+      case 'admin':
+        if (!authService.isAuthenticated() || user?.role !== 'admin') {
+          setShowAuthModal(true);
+          return <NewsFeed  onArticleClick={handleArticleClick} />;
+        }
+        return <AdminDashboard user={user!} onPageChange={handlePageChange} />;
+      case 'upload':
+        if (!authService.isAuthenticated() || user?.role !== 'admin') {
+          setShowAuthModal(true);
+          return <NewsFeed  onArticleClick={handleArticleClick} />;
+        }
+        return <NewsUploadPage user={user!} />;
+      case 'users':
+        if (!authService.isAuthenticated() || user?.role !== 'admin') {
+          setShowAuthModal(true);
+          return <NewsFeed  onArticleClick={handleArticleClick} />;
+        }
+        return <UsersManagement user={user!} />;
+      case 'categories':
+        if (!authService.isAuthenticated() || user?.role !== 'admin') {
+          setShowAuthModal(true);
+          return <NewsFeed  onArticleClick={handleArticleClick} />;
+        }
+        return <CategoriesManagement user={user!} />;
+      default:
+        return <NewsFeed  onArticleClick={handleArticleClick} />;
     }
   };
 

@@ -19,10 +19,10 @@ app.use(express.json());
 
 // PostgreSQL connection
 const pool = new Pool({
-  user: process.env.DB_USER || 'pguser',
+  user: process.env.DB_USER || 'postgres',
   host: process.env.DB_HOST || 'localhost',
-  database: process.env.DB_NAME || 'user-db',
-  password: process.env.DB_PASSWORD || 'S3cret',
+  database: process.env.DB_NAME || 'info-pulse-db',
+  password: process.env.DB_PASSWORD || 'password',
   port: process.env.DB_PORT || 5432,
 });
 
@@ -47,6 +47,35 @@ const DEFAULT_CATEGORIES = [
   'Education', 'Travel', 'Food', 'Fashion', 'Automotive',
   'Real Estate', 'Finance', 'Gaming', 'Music', 'Movies',
 ];
+
+// Helper function to assign categories to a user
+async function assignUserCategories(userId, categoryIds, isAdmin) {
+  let categoriesToAssign = [];
+  if (Array.isArray(categoryIds) && categoryIds.length > 0) {
+    // Validate provided category_ids
+    const validCategories = await pool.query(
+      'SELECT id FROM news_categories WHERE id = ANY($1)',
+      [categoryIds]
+    );
+    categoriesToAssign = validCategories.rows.map(row => row.id);
+  }
+
+  // If no valid categories provided or is_admin is true, assign default categories
+  if (categoriesToAssign.length === 0 && !isAdmin) {
+    const defaultCategories = await pool.query(
+      'SELECT id FROM news_categories ORDER BY id LIMIT 5'
+    );
+    categoriesToAssign = defaultCategories.rows.map(row => row.id);
+  }
+
+  // Insert user categories
+  for (const categoryId of categoriesToAssign) {
+    await pool.query(
+      'INSERT INTO user_topics (user_id, category_id) VALUES ($1, $2) ON CONFLICT DO NOTHING',
+      [userId, categoryId]
+    );
+  }
+}
 
 // Function to get and save news articles
 const getAllNewsArticles = async () => {
@@ -243,17 +272,8 @@ async function initializeDatabase() {
 
           const newUserId = result.rows[0].id;
 
-          if (!user.is_admin) {
-            const defaultCategories = await pool.query(
-              'SELECT id FROM news_categories ORDER BY id LIMIT 5'
-            );
-            for (const category of defaultCategories.rows) {
-              await pool.query(
-                'INSERT INTO user_topics (user_id, category_id) VALUES ($1, $2) ON CONFLICT DO NOTHING',
-                [newUserId, category.id]
-              );
-            }
-          }
+          // Assign categories to the new user
+          await assignUserCategories(newUserId, [], user.is_admin);
 
           console.log(`Created user: ${user.username} (${user.is_admin ? 'admin' : 'regular'})`);
         } else {
@@ -302,7 +322,7 @@ const requireAdmin = (req, res, next) => {
 // Register
 app.post('/api/register', async (req, res) => {
   try {
-    const { username, email, password, is_admin = false } = req.body;
+    const { username, email, password, is_admin = false, category_ids } = req.body;
 
     if (!username || !email || !password) {
       return res.status(400).json({ error: 'Username, email, and password are required' });
@@ -325,15 +345,8 @@ app.post('/api/register', async (req, res) => {
 
     const newUser = result.rows[0];
 
-    const defaultCategories = await pool.query(
-      'SELECT id FROM news_categories ORDER BY id LIMIT 5'
-    );
-    for (const category of defaultCategories.rows) {
-      await pool.query(
-        'INSERT INTO user_topics (user_id, category_id) VALUES ($1, $2) ON CONFLICT DO NOTHING',
-        [newUser.id, category.id]
-      );
-    }
+    // Assign categories to the new user
+    await assignUserCategories(newUser.id, category_ids, is_admin);
 
     const token = jwt.sign(
       { id: newUser.id, username: newUser.username, is_admin: newUser.is_admin },
@@ -836,6 +849,110 @@ app.get('/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
+// Root endpoint
+app.get('/', (req, res) => {
+  // Define server API endpoints
+  const apiEndpoints = [
+    {
+      endpoint: "/api/register",
+      method: "POST",
+      description: "Register a new user"
+    },
+    {
+      endpoint: "/api/login",
+      method: "POST",
+      description: "User login"
+    },
+    {
+      endpoint: "/api/logout",
+      method: "POST",
+      description: "User logout"
+    },
+    {
+      endpoint: "/api/refresh-token",
+      method: "POST",
+      description: "Refresh access token"
+    },
+    {
+      endpoint: "/api/profile",
+      method: "GET",
+      description: "Get user profile"
+    },
+    {
+      endpoint: "/api/articles",
+      method: "GET",
+      description: "Get all articles with pagination"
+    },
+    {
+      endpoint: "/api/articles/:id",
+      method: "GET",
+      description: "Get single article"
+    },
+    {
+      endpoint: "/api/admin/sync-articles",
+      method: "POST",
+      description: "Manual sync articles (Admin only)"
+    },
+    {
+      endpoint: "/api/categories",
+      method: "GET",
+      description: "Get all categories"
+    },
+    {
+      endpoint: "/api/my-topics",
+      method: "GET",
+      description: "Get user topics"
+    },
+    {
+      endpoint: "/api/my-topics",
+      method: "PUT",
+      description: "Update user topics"
+    },
+    {
+      endpoint: "/api/admin/stats",
+      method: "GET",
+      description: "Get admin statistics"
+    },
+    {
+      endpoint: "/api/admin/users",
+      method: "GET",
+      description: "Get all users (Admin only)"
+    },
+    {
+      endpoint: "/api/admin/users/:id",
+      method: "DELETE",
+      description: "Delete user (Admin only)"
+    },
+    {
+      endpoint: "/api/admin/categories",
+      method: "GET",
+      description: "Get all categories with article count (Admin only)"
+    },
+    {
+      endpoint: "/api/admin/categories",
+      method: "POST",
+      description: "Create new category (Admin only)"
+    },
+    {
+      endpoint: "/api/admin/categories/:id",
+      method: "DELETE",
+      description: "Delete category (Admin only)"
+    },
+    {
+      endpoint: "/api/user/categories/:user_id",
+      method: "GET",
+      description: "Get user categories"
+    },
+    {
+      endpoint: "/health",
+      method: "GET",
+      description: "Health check"
+    }
+  ];
+
+  res.json({ message: 'Welcome to the API', endpoints: apiEndpoints });
+});
+
 // Start server
 async function startServer() {
   try {
@@ -849,6 +966,7 @@ async function startServer() {
       console.log('Available endpoints:');
       console.log('- POST /api/register - Register new user');
       console.log('- POST /api/login - User login');
+      console.log('- POST /api/logout - User logout');
       console.log('- POST /api/refresh-token - Refresh access token');
       console.log('- GET /api/profile - Get user profile');
       console.log('- GET /api/articles - Get all articles with pagination');
@@ -864,7 +982,6 @@ async function startServer() {
       console.log('- POST /api/admin/categories - Create new category (Admin only)');
       console.log('- DELETE /api/admin/categories/:id - Delete category (Admin only)');
       console.log('- GET /api/user/categories/:user_id - Get user categories');
-      console.log('- POST /api/logout - Logout user');
       console.log('- GET /health - Health check');
     });
   } catch (error) {
@@ -873,18 +990,5 @@ async function startServer() {
   }
 }
 
-// Schedule periodic sync of news articles (every 30 minutes)
-setInterval(async () => {
-  console.log('Running scheduled news sync...');
-  try {
-    await getAllNewsArticles();
-  } catch (error) {
-    console.error('Scheduled sync error:', error);
-  }
-}, 30 * 60 * 1000); // 30 minutes
-
-if (process.env.NODE_ENV !== 'test') {
-  startServer();
-}
-
-module.exports = app;
+// Start the server
+startServer();

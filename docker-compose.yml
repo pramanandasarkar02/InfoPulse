@@ -1,23 +1,23 @@
 services:
-  newsfetching:
-    build:
-      context: ./info-pulse-api/news-fetching-service
-      dockerfile: Dockerfile
-    ports:
-      - "3001:3001"
-    environment:
-      - NODE_ENV=production
-    restart: unless-stopped
+  # newsfetching:
+  #   build:
+  #     context: ./info-pulse-api/news-fetching-service
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "3001:3001"
+  #   environment:
+  #     - NODE_ENV=production
+  #   restart: unless-stopped
 
-  newsprocessing:
-    build:
-      context: ./info-pulse-api/news-processing-service
-      dockerfile: Dockerfile
-    ports:
-      - "3002:3002"
-    environment:
-      - NODE_ENV=production
-    restart: unless-stopped
+  # newsprocessing:
+  #   build:
+  #     context: ./info-pulse-api/news-processing-service
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "3002:3002"
+  #   environment:
+  #     - NODE_ENV=production
+  #   restart: unless-stopped
 
   postgres:
     image: postgres:14-alpine
@@ -26,12 +26,12 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     environment:
-      - POSTGRES_PASSWORD=S3cret
-      - POSTGRES_USER=pguser
-      - POSTGRES_DB=user-db
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=info-pulse-db
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U pguser -d user-db"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d info-pulse-db"]
       interval: 5s
       timeout: 5s
       retries: 10

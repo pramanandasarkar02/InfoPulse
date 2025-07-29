@@ -1,19 +1,20 @@
 import { useState, useEffect, useMemo } from 'react';
-import { NewsArticle, SearchFilters, UserPreferences } from '../types';
-import { NewsApiService } from '../services/newsApi';
+// import { NewsArticle, SearchFilters, UserPreferences } from '../types';
+// import { NewsApiService } from '../services/newsApi';
 import { getUserPreferences } from '../utils/localStorage';
+import newsService, { NewsArticle } from '../services/NewsService';
 
 export const useNews = () => {
   const [articles, setArticles] = useState<NewsArticle[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [preferences, setPreferences] = useState<UserPreferences>(getUserPreferences());
-  const [filters, setFilters] = useState<SearchFilters>({
-    query: '',
-    category: '',
-    sortBy: 'newest',
-    dateRange: 'all',
-  });
+  // const [preferences, setPreferences] = useState<UserPreferences>(getUserPreferences());
+  // const [filters, setFilters] = useState<SearchFilters>({
+  //   query: '',
+  //   category: '',
+  //   sortBy: 'newest',
+  //   dateRange: 'all',
+  // });
 
   // Fetch articles on component mount
   useEffect(() => {
@@ -21,7 +22,7 @@ export const useNews = () => {
       try {
         setLoading(true);
         setError(null);
-        const fetchedArticles = await NewsApiService.fetchArticles();
+        const fetchedArticles = await newsService.getArticles();
         setArticles(fetchedArticles);
       } catch (err) {
         setError('Failed to load articles. Please try again later.');

@@ -22,6 +22,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
   isRefreshing = false,
 }) => {
   const handleCategoryChange = (category: string) => {
+    
+
+
     onFiltersChange({ ...filters, category: category === filters.category ? '' : category });
   };
 
